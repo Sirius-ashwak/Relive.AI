@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Conversation, Message } from '../types';
+import { jsonDateReviver } from '../lib/utils';
 
 interface ConversationState {
   conversations: Conversation[];
@@ -91,6 +92,13 @@ export const useConversationStore = create<ConversationState>()(
     }),
     {
       name: 'conversation-storage',
+      deserialize: (str) => {
+        try {
+          return JSON.parse(str, jsonDateReviver);
+        } catch {
+          return { state: { conversations: [], activeConversation: null, isLoading: false } };
+        }
+      }
     }
   )
 );

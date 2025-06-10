@@ -59,3 +59,11 @@ export function throttle<T extends (...args: any[]) => any>(
     }
   }
 }
+
+export function jsonDateReviver(key: string, value: any): any {
+  // Check if the value is a string that looks like an ISO 8601 date
+  if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(value)) {
+    return new Date(value);
+  }
+  return value;
+}

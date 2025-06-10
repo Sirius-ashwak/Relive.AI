@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Persona } from '../types';
+import { jsonDateReviver } from '../lib/utils';
 
 interface PersonaState {
   personas: Persona[];
@@ -123,6 +124,13 @@ export const usePersonaStore = create<PersonaState>()(
     }),
     {
       name: 'persona-storage',
+      deserialize: (str) => {
+        try {
+          return JSON.parse(str, jsonDateReviver);
+        } catch {
+          return { state: { personas: [], activePersona: null, isLoading: false } };
+        }
+      },
       onRehydrateStorage: () => (state) => {
         // Initialize default personas if none exist
         if (state && state.personas.length === 0) {

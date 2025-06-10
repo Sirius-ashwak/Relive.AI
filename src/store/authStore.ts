@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '../types';
+import { jsonDateReviver } from '../lib/utils';
 
 interface AuthState {
   user: User | null;
@@ -91,6 +92,13 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
+      deserialize: (str) => {
+        try {
+          return JSON.parse(str, jsonDateReviver);
+        } catch {
+          return { state: { user: null, isAuthenticated: false, isLoading: false } };
+        }
+      },
       onRehydrateStorage: () => (state) => {
         // Initialize user if not already authenticated
         if (state && !state.isAuthenticated) {
