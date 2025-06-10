@@ -7,6 +7,8 @@ import PersonaGrid from './PersonaGrid';
 import ConversationsSection from './ConversationsSection';
 import ProfileSection from './ProfileSection';
 import SettingsSection from './SettingsSection';
+import MemoriesSection from './MemoriesSection';
+import TimelineSection from './TimelineSection';
 import MemoryCreator from './MemoryCreator';
 import ChatInterface from './ChatInterface';
 import { Persona } from '../types';
@@ -42,19 +44,9 @@ const AppLayout: React.FC = () => {
       case 'settings':
         return <SettingsSection />;
       case 'memories':
-        return (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-bold text-white mb-4">Memories</h2>
-            <p className="text-gray-400">Memory preservation feature coming soon...</p>
-          </div>
-        );
+        return <MemoriesSection />;
       case 'timeline':
-        return (
-          <div className="text-center py-20">
-            <h2 className="text-2xl font-bold text-white mb-4">Timeline</h2>
-            <p className="text-gray-400">Memory timeline feature coming soon...</p>
-          </div>
-        );
+        return <TimelineSection />;
       case 'help':
         return (
           <div className="text-center py-20">
