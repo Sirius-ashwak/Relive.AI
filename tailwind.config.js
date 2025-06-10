@@ -8,7 +8,7 @@ export default {
         'inter': ['Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // Premium Dark Palette
+        // Apple-Style Dark Palette
         obsidian: {
           50: '#F8F9FA',
           100: '#E9ECEF',
@@ -22,7 +22,7 @@ export default {
           900: '#0A0B0D',
           950: '#050507'
         },
-        // Sophisticated Accent Colors
+        // Apple-Style Accent Colors
         aurora: {
           50: '#F0F9FF',
           100: '#E0F2FE',
@@ -101,11 +101,11 @@ export default {
       keyframes: {
         float: {
           '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
+          '50%': { transform: 'translateY(-6px)' },
         },
         glow: {
-          '0%': { boxShadow: '0 0 20px rgba(14, 165, 233, 0.3)' },
-          '100%': { boxShadow: '0 0 30px rgba(14, 165, 233, 0.6)' },
+          '0%': { boxShadow: '0 0 10px rgba(14, 165, 233, 0.2)' },
+          '100%': { boxShadow: '0 0 20px rgba(14, 165, 233, 0.4)' },
         },
         shimmer: {
           '0%': { transform: 'translateX(-100%)' },
@@ -113,18 +113,23 @@ export default {
         },
         'pulse-soft': {
           '0%, 100%': { opacity: '0.8', transform: 'scale(1)' },
-          '50%': { opacity: '1', transform: 'scale(1.02)' },
+          '50%': { opacity: '1', transform: 'scale(1.01)' },
         },
       },
       backdropBlur: {
         'xs': '2px',
       },
       boxShadow: {
-        'premium': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        'glow-blue': '0 0 20px rgba(14, 165, 233, 0.5)',
-        'glow-purple': '0 0 20px rgba(168, 85, 247, 0.5)',
-        'glow-gold': '0 0 20px rgba(245, 158, 11, 0.5)',
-        'glow-premium': '0 0 30px rgba(14, 165, 233, 0.4), 0 0 60px rgba(168, 85, 247, 0.3)',
+        'premium': '0 4px 16px rgba(0, 0, 0, 0.1)',
+        'glow-blue': '0 0 20px rgba(14, 165, 233, 0.3)',
+        'glow-purple': '0 0 20px rgba(168, 85, 247, 0.3)',
+        'glow-gold': '0 0 20px rgba(245, 158, 11, 0.3)',
+        'glow-premium': '0 0 30px rgba(14, 165, 233, 0.2), 0 0 60px rgba(168, 85, 247, 0.1)',
+      },
+      borderRadius: {
+        'xl': '12px',
+        '2xl': '16px',
+        '3xl': '24px',
       }
     },
   },
