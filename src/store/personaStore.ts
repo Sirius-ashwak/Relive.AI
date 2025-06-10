@@ -11,12 +11,13 @@ interface PersonaState {
   deletePersona: (id: string) => void;
   setActivePersona: (persona: Persona | null) => void;
   getPersonasByType: (type: Persona['type']) => Persona[];
+  initializeDefaultPersonas: () => void;
 }
 
-const defaultPersonas: Persona[] = [
+const createDefaultPersonas = (): Persona[] => [
   {
     id: '1',
-    userId: '1',
+    userId: 'demo-user-1',
     name: 'Mom (Age 45)',
     type: 'memory',
     avatar: '👩',
@@ -34,7 +35,7 @@ const defaultPersonas: Persona[] = [
   },
   {
     id: '2',
-    userId: '1',
+    userId: 'demo-user-1',
     name: 'You at 16',
     type: 'younger',
     avatar: '🧑',
@@ -54,7 +55,7 @@ const defaultPersonas: Persona[] = [
   },
   {
     id: '3',
-    userId: '1',
+    userId: 'demo-user-1',
     name: 'Future You (35)',
     type: 'future',
     avatar: '👨‍💼',
@@ -77,9 +78,16 @@ const defaultPersonas: Persona[] = [
 export const usePersonaStore = create<PersonaState>()(
   persist(
     (set, get) => ({
-      personas: defaultPersonas,
+      personas: [],
       activePersona: null,
       isLoading: false,
+
+      initializeDefaultPersonas: () => {
+        const { personas } = get();
+        if (personas.length === 0) {
+          set({ personas: createDefaultPersonas() });
+        }
+      },
 
       addPersona: (personaData) => {
         const newPersona: Persona = {
@@ -115,6 +123,20 @@ export const usePersonaStore = create<PersonaState>()(
     }),
     {
       name: 'persona-storage',
+      onRehydrateStorage: () => (state) => {
+        // Initialize default personas if none exist
+        if (state && state.personas.length === 0) {
+          state.initializeDefaultPersonas();
+        }
+      }
     }
   )
 );
+
+// Initialize default personas on app start
+if (typeof window !== 'undefined') {
+  const store = usePersonaStore.getState();
+  if (store.personas.length === 0) {
+    store.initializeDefaultPersonas();
+  }
+}

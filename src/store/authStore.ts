@@ -10,6 +10,7 @@ interface AuthState {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
   updateUser: (updates: Partial<User>) => void;
+  initializeUser: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -18,6 +19,20 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isLoading: false,
+
+      initializeUser: () => {
+        // Create a default user for demo purposes
+        const defaultUser: User = {
+          id: 'demo-user-1',
+          email: 'demo@relive.ai',
+          name: 'Demo User',
+          subscription: 'free',
+          createdAt: new Date(),
+          avatar: '👤'
+        };
+
+        set({ user: defaultUser, isAuthenticated: true });
+      },
 
       login: async (email: string, password: string) => {
         set({ isLoading: true });
@@ -76,6 +91,20 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
+      onRehydrateStorage: () => (state) => {
+        // Initialize user if not already authenticated
+        if (state && !state.isAuthenticated) {
+          state.initializeUser();
+        }
+      }
     }
   )
 );
+
+// Initialize user on app start
+if (typeof window !== 'undefined') {
+  const store = useAuthStore.getState();
+  if (!store.isAuthenticated) {
+    store.initializeUser();
+  }
+}

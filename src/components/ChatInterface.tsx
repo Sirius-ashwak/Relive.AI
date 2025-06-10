@@ -46,7 +46,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
         });
       }, 1000);
     }
-  }, [persona, user]);
+  }, [persona, user, activeConversation, createConversation, addMessage]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -489,7 +489,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
               placeholder={`Message ${persona.name}...`}
               rows={1}
               disabled={isLoading}
-              className="input-premium resize-none disabled:opacity-50"
+              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-aurora-400/50 focus:outline-none text-white placeholder-obsidian-400 resize-none disabled:opacity-50 transition-all duration-300"
             />
           </div>
           
@@ -498,7 +498,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
             whileTap={{ scale: 0.95 }}
             onClick={handleSendMessage}
             disabled={!message.trim() || isLoading}
-            className="btn-premium text-obsidian-900 font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            className="btn-premium text-obsidian-900 font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center px-6 py-3"
           >
             {isLoading ? (
               <motion.div
