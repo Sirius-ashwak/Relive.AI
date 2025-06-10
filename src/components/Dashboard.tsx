@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { MessageCircle, Users, Heart, Clock, TrendingUp, Sparkles } from 'lucide-react';
-import PersonaCard from './PersonaCard';
+import { MessageCircle, Users, Heart, Clock, TrendingUp, Sparkles, Plus } from 'lucide-react';
 import { usePersonaStore } from '../store/personaStore';
 import { useConversationStore } from '../store/conversationStore';
 import { Persona } from '../types';
@@ -20,25 +19,25 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartChat, onCreateMemory }) =>
       label: 'Active Personas',
       value: personas.filter(p => p.status === 'active').length,
       icon: Users,
-      color: 'from-accent-cyan/20 to-accent-pink/20'
+      color: 'text-aurora-400'
     },
     {
       label: 'Conversations',
       value: conversations.length,
       icon: MessageCircle,
-      color: 'from-accent-pink/20 to-accent-purple/20'
+      color: 'text-coral-400'
     },
     {
-      label: 'Memories Preserved',
+      label: 'Memories',
       value: personas.reduce((acc, p) => acc + p.memoryData.memories.length, 0),
       icon: Heart,
-      color: 'from-accent-purple/20 to-accent-cyan/20'
+      color: 'text-lavender-400'
     },
     {
-      label: 'Hours Talked',
+      label: 'Hours',
       value: Math.floor(conversations.reduce((acc, c) => acc + c.duration, 0) / 60),
       icon: Clock,
-      color: 'from-accent-cyan/20 to-accent-purple/20'
+      color: 'text-sage-400'
     }
   ];
 
@@ -46,19 +45,26 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartChat, onCreateMemory }) =>
     .sort((a, b) => b.lastInteraction.getTime() - a.lastInteraction.getTime())
     .slice(0, 3);
 
+  const formatTimeAgo = (date: Date) => {
+    const days = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    return `${days} days ago`;
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Welcome Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <h1 className="font-sora text-4xl font-bold mb-4">
+        <h1 className="font-manrope text-3xl font-bold mb-3">
           <span className="gradient-text">Welcome Back</span>
         </h1>
-        <p className="text-xl text-gray-300">
-          Your memory companions are waiting to continue your conversations
+        <p className="text-lg text-obsidian-300">
+          Your memory companions are ready to continue your conversations
         </p>
       </motion.div>
 
@@ -67,7 +73,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartChat, onCreateMemory }) =>
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-6"
       >
         {stats.map((stat, index) => (
           <motion.div
@@ -75,24 +81,20 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartChat, onCreateMemory }) =>
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 + index * 0.1 }}
-            whileHover={{ scale: 1.05, y: -5 }}
-            className={`p-6 rounded-2xl glass glass-hover bg-gradient-to-br ${stat.color}`}
+            whileHover={{ y: -2 }}
+            className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-aurora p-0.5">
-                <div className="w-full h-full rounded-xl bg-dark-400 flex items-center justify-center">
-                  <stat.icon className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <TrendingUp className="w-5 h-5 text-green-400" />
+              <stat.icon className={`w-6 h-6 ${stat.color}`} />
+              <TrendingUp className="w-4 h-4 text-sage-400" />
             </div>
-            <div className="text-3xl font-bold text-white mb-1">{stat.value}</div>
-            <div className="text-sm text-gray-300">{stat.label}</div>
+            <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
+            <div className="text-sm text-obsidian-400">{stat.label}</div>
           </motion.div>
         ))}
       </motion.div>
 
-      {/* Recent Personas */}
+      {/* Recent Conversations */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -100,66 +102,64 @@ const Dashboard: React.FC<DashboardProps> = ({ onStartChat, onCreateMemory }) =>
         className="space-y-6"
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-sora text-2xl font-bold text-white">Recent Conversations</h2>
+          <h2 className="font-manrope text-xl font-semibold text-white">Recent Conversations</h2>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={onCreateMemory}
-            className="flex items-center space-x-2 px-4 py-2 bg-gradient-aurora rounded-xl font-semibold text-dark-500"
+            className="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/15 rounded-xl border border-white/20 hover:border-white/30 transition-all duration-300 text-white font-medium"
           >
-            <Sparkles className="w-4 h-4" />
+            <Plus className="w-4 h-4" />
             <span>New Memory</span>
           </motion.button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-4">
           {recentPersonas.map((persona, index) => (
             <motion.div
               key={persona.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 + index * 0.1 }}
+              whileHover={{ x: 4 }}
+              onClick={() => onStartChat(persona)}
+              className="group bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 cursor-pointer transition-all duration-300"
             >
-              <PersonaCard
-                name={persona.name}
-                type={persona.type}
-                lastInteraction={`${Math.floor((Date.now() - persona.lastInteraction.getTime()) / (1000 * 60 * 60 * 24))} days ago`}
-                avatar={persona.avatar}
-                status={persona.status}
-                onClick={() => onStartChat(persona)}
-              />
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-premium p-0.5">
+                    <div className="w-full h-full rounded-xl bg-obsidian-800 flex items-center justify-center text-lg">
+                      {persona.avatar}
+                    </div>
+                  </div>
+                  {persona.status === 'active' && (
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-sage-400 border-2 border-obsidian-950" />
+                  )}
+                </div>
+                
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-white group-hover:text-aurora-300 transition-colors">
+                      {persona.name}
+                    </h3>
+                    <span className="text-sm text-obsidian-400">
+                      {formatTimeAgo(persona.lastInteraction)}
+                    </span>
+                  </div>
+                  <p className="text-sm text-obsidian-400 mt-1">
+                    {persona.conversationCount} conversations
+                  </p>
+                </div>
+
+                <motion.div
+                  className="opacity-0 group-hover:opacity-100 transition-opacity"
+                  whileHover={{ scale: 1.1 }}
+                >
+                  <MessageCircle className="w-5 h-5 text-aurora-400" />
+                </motion.div>
+              </div>
             </motion.div>
           ))}
-        </div>
-      </motion.div>
-
-      {/* Quick Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
-        <div className="p-6 rounded-2xl glass glass-hover">
-          <h3 className="font-semibold text-white mb-4">Memory Insights</h3>
-          <p className="text-gray-300 mb-4">
-            Your conversations are helping preserve precious memories and creating meaningful connections.
-          </p>
-          <div className="flex items-center space-x-2 text-accent-cyan">
-            <Heart className="w-4 h-4" />
-            <span className="text-sm">View detailed analytics</span>
-          </div>
-        </div>
-
-        <div className="p-6 rounded-2xl glass glass-hover">
-          <h3 className="font-semibold text-white mb-4">AI Learning Progress</h3>
-          <p className="text-gray-300 mb-4">
-            Your personas are continuously learning from your conversations to become more authentic.
-          </p>
-          <div className="flex items-center space-x-2 text-accent-purple">
-            <Sparkles className="w-4 h-4" />
-            <span className="text-sm">See learning updates</span>
-          </div>
         </div>
       </motion.div>
     </div>
