@@ -19,12 +19,12 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
   status,
   onClick
 }) => {
-  const getTypeGradient = () => {
+  const getTypeColor = () => {
     switch (type) {
-      case 'memory': return 'from-coral-500/10 to-lavender-500/10';
-      case 'younger': return 'from-aurora-500/10 to-sage-500/10';
-      case 'future': return 'from-lavender-500/10 to-gold-500/10';
-      default: return 'from-obsidian-600/10 to-obsidian-700/10';
+      case 'memory': return 'text-coral-400';
+      case 'younger': return 'text-aurora-400';
+      case 'future': return 'text-lavender-400';
+      default: return 'text-obsidian-400';
     }
   };
 
@@ -76,11 +76,11 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
         hover: { duration: 0.2 }
       }}
       onClick={onClick}
-      className={`group relative cursor-pointer bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300 bg-gradient-to-br ${getTypeGradient()}`}
+      className="group relative cursor-pointer bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <div className="px-3 py-1 rounded-full bg-gradient-premium text-obsidian-900 text-xs font-bold">
+        <div className={`px-3 py-1 rounded-full bg-white/10 ${getTypeColor()} text-xs font-bold`}>
           {getTypeLabel()}
         </div>
         {getStatusIndicator()}
@@ -92,16 +92,14 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
           whileHover={{ scale: 1.05 }}
           className="relative"
         >
-          <div className="w-14 h-14 rounded-2xl bg-gradient-premium p-0.5">
-            <div className="w-full h-full rounded-2xl bg-obsidian-800 flex items-center justify-center text-xl">
-              {avatar}
-            </div>
+          <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-xl">
+            {avatar}
           </div>
           <motion.div
-            className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-gradient-premium flex items-center justify-center"
+            className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white/20 border border-white/30 flex items-center justify-center"
             whileHover={{ scale: 1.1 }}
           >
-            <Sparkles className="w-2.5 h-2.5 text-obsidian-900" />
+            <Sparkles className="w-2.5 h-2.5 text-aurora-400" />
           </motion.div>
         </motion.div>
         
@@ -120,7 +118,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="flex-1 btn-premium text-obsidian-900 font-bold flex items-center justify-center space-x-2 py-3"
+          className="flex-1 bg-white/10 hover:bg-white/15 border border-white/20 hover:border-white/30 text-white font-medium flex items-center justify-center space-x-2 py-3 rounded-xl transition-all duration-300"
         >
           <MessageCircle className="w-4 h-4" />
           <span className="text-sm">Start Chat</span>
@@ -145,7 +143,11 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
 
       {/* Bottom Accent Line */}
       <motion.div
-        className="absolute bottom-0 left-0 h-0.5 bg-gradient-premium rounded-full"
+        className={`absolute bottom-0 left-0 h-0.5 rounded-full ${
+          type === 'memory' ? 'bg-coral-400' :
+          type === 'younger' ? 'bg-aurora-400' :
+          'bg-lavender-400'
+        }`}
         initial={{ width: 0 }}
         whileInView={{ width: "100%" }}
         viewport={{ once: true }}
