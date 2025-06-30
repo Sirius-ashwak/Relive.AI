@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Play, Sparkles, Clock, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import AuthModal from './AuthModal';
+import BoltBadge from './BoltBadge';
 
 interface HeroProps {
   onStartApp?: () => void;
@@ -23,44 +24,8 @@ const Hero: React.FC<HeroProps> = ({ onStartApp }) => {
   return (
     <>
       <section className="relative min-h-screen flex items-center justify-center aurora-bg overflow-hidden">
-        {/* Bolt.new Badge - Top Right */}
-        <motion.a
-          href="https://bolt.new/"
-          target="_blank"
-          rel="noopener noreferrer"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 1 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          className="fixed top-6 right-6 z-50 group"
-          title="Powered by Bolt.new"
-        >
-          <div className="relative w-16 h-16">
-            {/* Glow effect */}
-            <div className="absolute inset-0 rounded-full bg-white/30 blur-md group-hover:bg-white/50 transition-all duration-300 animate-pulse"></div>
-            
-            {/* Badge Image */}
-            <img 
-              src="/white_circle_360x360.png" 
-              alt="Powered by Bolt.new" 
-              className="relative w-full h-full rounded-full shadow-lg group-hover:shadow-xl transition-all duration-300"
-              onError={(e) => {
-                // Fallback if image doesn't load
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const fallback = target.nextElementSibling as HTMLElement;
-                if (fallback) fallback.style.display = 'flex';
-              }}
-            />
-            
-            {/* Fallback badge if image fails to load */}
-            <div className="absolute inset-0 rounded-full bg-white shadow-lg flex-col items-center justify-center text-black text-xs font-bold leading-tight hidden group-hover:shadow-xl transition-all duration-300">
-              <div className="text-lg mb-1">⚡</div>
-              <div className="text-[8px] font-black">BOLT.NEW</div>
-            </div>
-          </div>
-        </motion.a>
+        {/* Bolt.new Badge */}
+        <BoltBadge />
 
         {/* Premium Floating Elements */}
         <div className="absolute inset-0 overflow-hidden">

@@ -1,0 +1,21 @@
+<svg width="360" height="360" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer white circle -->
+  <circle cx="180" cy="180" r="180" fill="white"/>
+  
+  <!-- Inner black circle -->
+  <circle cx="180" cy="180" r="160" fill="black"/>
+  
+  <!-- Lightning bolt -->
+  <path d="M140 120 L200 120 L170 180 L220 180 L160 240 L190 180 L140 180 Z" fill="white"/>
+  
+  <!-- Text around the circle -->
+  <path id="circle-text" d="M 180,180 m -140,0 a 140,140 0 1,1 280,0 a 140,140 0 1,1 -280,0" fill="none"/>
+  <text fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold">
+    <textPath href="#circle-text" startOffset="0%">
+      POWERED BY BOLT.NEW MADE IN BOLT.NEW
+    </textPath>
+  </text>
+  
+  <!-- Center "b" logo -->
+  <text x="180" y="195" text-anchor="middle" fill="white" font-size="80" font-weight="900" font-family="Arial, sans-serif">b</text>
+</svg>
