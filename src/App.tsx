@@ -13,9 +13,20 @@ import AppLayout from './components/AppLayout';
 import { useAuthStore } from './store/authStore';
 
 function App() {
-  const { isAuthenticated, isLoading } = useAuthStore();
+  const { isAuthenticated, isLoading, initializeUser } = useAuthStore();
   const [showIntro, setShowIntro] = useState(true);
   const [showApp, setShowApp] = useState(false);
+  const [appError, setAppError] = useState<string | null>(null);
+
+  // Initialize auth store on app start
+  useEffect(() => {
+    try {
+      initializeUser();
+    } catch (error) {
+      console.error('Failed to initialize user:', error);
+      setAppError('Failed to initialize application');
+    }
+  }, [initializeUser]);
 
   // Handle intro completion
   const handleIntroComplete = () => {
@@ -28,6 +39,24 @@ function App() {
     setShowIntro(false);
     setShowApp(true);
   };
+
+  // Error state
+  if (appError) {
+    return (
+      <div className="min-h-screen bg-obsidian-950 flex items-center justify-center p-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Application Error</h1>
+          <p className="text-obsidian-300 mb-6">{appError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-aurora-500 text-white rounded-xl font-semibold hover:bg-aurora-600 transition-colors"
+          >
+            Refresh Page
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Show loading state while checking authentication
   if (isLoading) {

@@ -56,8 +56,31 @@ export default defineConfig({
           vendor: ['react', 'react-dom'],
           ui: ['framer-motion', '@radix-ui/react-dialog', '@radix-ui/react-switch'],
           utils: ['date-fns', 'clsx', 'tailwind-merge'],
+          ai: ['@google/generative-ai'],
+          database: ['@supabase/supabase-js'],
         },
       },
     },
+    target: 'esnext',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: false, // Keep console logs for debugging
+        drop_debugger: true,
+      },
+    },
+    sourcemap: true, // Enable source maps for debugging
+  },
+  server: {
+    port: 5173,
+    host: true,
+  },
+  preview: {
+    port: 4173,
+    host: true,
+  },
+  define: {
+    // Ensure environment variables are properly defined
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
 });

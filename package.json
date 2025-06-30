@@ -65,9 +65,7 @@
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-window": "^1.8.8",
     "workbox-window": "^7.0.0",
-    "@supabase/supabase-js": "^2.39.0",
-    "algosdk": "^2.7.0",
-    "web3.storage": "^4.5.5"
+    "@supabase/supabase-js": "^2.39.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
