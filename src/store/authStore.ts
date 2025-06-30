@@ -16,6 +16,12 @@ interface AuthState {
   initializeUser: () => void;
 }
 
+// Helper function to validate UUID format
+const isValidUUID = (uuid: string): boolean => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -181,9 +187,26 @@ export const useAuthStore = create<AuthState>()(
         }
       },
       onRehydrateStorage: () => (state) => {
-        // Initialize user if not already authenticated
-        if (state && !state.isAuthenticated) {
-          state.initializeUser();
+        if (state) {
+          const isSupabaseConfiguredNow = isSupabaseConfigured();
+          
+          // If Supabase is configured and we have a user with invalid UUID or demo user, clear auth
+          if (isSupabaseConfiguredNow && state.user) {
+            const hasInvalidUUID = !isValidUUID(state.user.id);
+            const isDemoUser = state.user.email === 'demo@relive.ai';
+            
+            if (hasInvalidUUID || isDemoUser) {
+              // Clear the authentication state to force re-login with valid Supabase credentials
+              state.user = null;
+              state.isAuthenticated = false;
+              return;
+            }
+          }
+          
+          // If Supabase is not configured and we don't have a valid authenticated user, initialize demo user
+          if (!isSupabaseConfiguredNow && !state.isAuthenticated) {
+            state.initializeUser();
+          }
         }
       }
     }
