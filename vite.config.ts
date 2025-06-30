@@ -65,23 +65,24 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: false, // Keep console logs for debugging
+        drop_console: false,
         drop_debugger: true,
       },
     },
-    sourcemap: false, // Disable source maps for production
+    sourcemap: false,
+    outDir: 'dist',
+    assetsDir: 'assets',
   },
   server: {
     port: 5173,
-    host: true,
+    host: '0.0.0.0',
   },
   preview: {
     port: 4173,
-    host: true,
+    host: '0.0.0.0',
   },
   define: {
-    // Ensure environment variables are properly defined
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
-  base: './', // Use relative paths for deployment
+  base: '/',
 });
