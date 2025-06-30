@@ -42,23 +42,6 @@ const Header = () => {
             </motion.div>
             
             <div className="flex items-center space-x-4">
-              {/* Bolt.new Badge */}
-              <motion.a
-                href="https://bolt.new/"
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 hover:shadow-lg"
-                title="Powered by Bolt.new"
-              >
-                <img 
-                  src="/white_circle_360x360.png" 
-                  alt="Powered by Bolt.new" 
-                  className="w-8 h-8 rounded-full"
-                />
-              </motion.a>
-
               {isAuthenticated ? (
                 <>
                   <div className="hidden md:flex items-center space-x-3 px-4 py-2 rounded-xl glass">

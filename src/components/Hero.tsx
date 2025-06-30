@@ -23,6 +23,26 @@ const Hero: React.FC<HeroProps> = ({ onStartApp }) => {
   return (
     <>
       <section className="relative min-h-screen flex items-center justify-center aurora-bg overflow-hidden">
+        {/* Bolt.new Badge - Top Right */}
+        <motion.a
+          href="https://bolt.new/"
+          target="_blank"
+          rel="noopener noreferrer"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          className="fixed top-6 right-6 z-50 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 hover:shadow-glow-blue"
+          title="Powered by Bolt.new"
+        >
+          <img 
+            src="/white_circle_360x360.png" 
+            alt="Powered by Bolt.new" 
+            className="w-10 h-10 rounded-full"
+          />
+        </motion.a>
+
         {/* Premium Floating Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
