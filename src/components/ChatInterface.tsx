@@ -5,8 +5,10 @@ import { useConversationStore } from '../store/conversationStore';
 import { usePersonaStore } from '../store/personaStore';
 import { useAuthStore } from '../store/authStore';
 import { geminiService } from '../services/geminiService';
-import { Persona } from '../types';
+import { Database } from '../types/database';
 import toast from 'react-hot-toast';
+
+type Persona = Database['public']['Tables']['personas']['Row'];
 
 interface ChatInterfaceProps {
   persona: Persona;
@@ -30,23 +32,44 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
     activeConversation, 
     createConversation, 
     addMessage, 
-    setActiveConversation 
+    setActiveConversation,
+    conversations
   } = useConversationStore();
 
   useEffect(() => {
-    if (user && !activeConversation) {
-      console.log('🎬 Starting new conversation with:', persona.name);
-      const conversationId = createConversation(persona.id, user.id);
+    if (user && persona) {
+      console.log('🎬 Starting conversation with:', persona.name);
       
-      // Add welcome message after a short delay
-      setTimeout(() => {
-        addMessage(conversationId, {
-          content: getWelcomeMessage(persona),
-          sender: 'persona'
-        });
-      }, 1000);
+      // Check if there's an existing active conversation for this persona
+      const existingConversation = conversations.find(
+        conv => conv.persona_id === persona.id && conv.is_active
+      );
+      
+      if (existingConversation) {
+        console.log('📱 Using existing conversation:', existingConversation.id);
+        setActiveConversation(existingConversation);
+      } else {
+        // Create new conversation
+        console.log('🆕 Creating new conversation');
+        createConversation(persona.id, `Chat with ${persona.name}`)
+          .then(conversationId => {
+            console.log('✅ Created conversation:', conversationId);
+            
+            // Add welcome message after a short delay
+            setTimeout(() => {
+              addMessage(conversationId, {
+                content: getWelcomeMessage(persona),
+                sender: 'persona'
+              });
+            }, 1000);
+          })
+          .catch(error => {
+            console.error('❌ Error creating conversation:', error);
+            toast.error('Failed to start conversation');
+          });
+      }
     }
-  }, [persona, user, activeConversation, createConversation, addMessage]);
+  }, [persona, user, createConversation, addMessage, setActiveConversation, conversations]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -68,10 +91,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
         `Hello, past self. I'm glad we can finally talk. I have so much wisdom to share with you about the journey ahead. What's on your mind?`,
         `It's good to see you again, younger me. I remember being exactly where you are now. What would you like to know about what's coming?`,
         `Hello there. I've been looking forward to this conversation. There's so much I want to tell you about the path ahead.`
+      ],
+      custom: [
+        `Hello! I'm excited to talk with you. What would you like to discuss today?`
       ]
     };
 
-    const messages = welcomeMessages[persona.type] || [`Hello! I'm excited to talk with you. What would you like to discuss?`];
+    const messages = welcomeMessages[persona.type] || welcomeMessages.custom;
     return messages[Math.floor(Math.random() * messages.length)];
   };
 
@@ -84,46 +110,54 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
     
     console.log('💬 Sending message:', userMessage);
     
-    // Add user message immediately
-    addMessage(activeConversation.id, {
-      content: userMessage,
-      sender: 'user'
-    });
-
-    // Show typing indicator
-    setIsTyping(true);
-    
     try {
+      // Add user message immediately
+      await addMessage(activeConversation.id, {
+        content: userMessage,
+        sender: 'user'
+      });
+
+      // Show typing indicator
+      setIsTyping(true);
+      
       // Generate AI response
       console.log('🤖 Generating AI response...');
       const response = await geminiService.generatePersonaResponse(
         persona,
         userMessage,
-        activeConversation.messages
+        activeConversation.messages || []
       );
 
       // Simulate realistic typing delay
       const typingDelay = Math.min(response.length * 30, 2000); // 30ms per character, max 2 seconds
       
-      setTimeout(() => {
-        addMessage(activeConversation.id, {
-          content: response,
-          sender: 'persona'
-        });
-        setIsTyping(false);
-        setIsLoading(false);
-        
-        // Update persona's last interaction
-        updatePersona(persona.id, { 
-          lastInteraction: new Date(),
-          conversationCount: persona.conversationCount + 1
-        });
-        
-        console.log('✅ Response added to conversation');
+      setTimeout(async () => {
+        try {
+          await addMessage(activeConversation.id, {
+            content: response,
+            sender: 'persona'
+          });
+          
+          setIsTyping(false);
+          setIsLoading(false);
+          
+          // Update persona's last interaction
+          await updatePersona(persona.id, { 
+            last_interaction: new Date().toISOString(),
+            conversation_count: persona.conversation_count + 1
+          });
+          
+          console.log('✅ Response added to conversation');
+        } catch (error) {
+          console.error('❌ Error adding response:', error);
+          setIsTyping(false);
+          setIsLoading(false);
+          toast.error('Failed to save response');
+        }
       }, Math.max(typingDelay, 800));
       
     } catch (error) {
-      console.error('❌ Error generating response:', error);
+      console.error('❌ Error in conversation:', error);
       toast.error('Failed to get response. Please try again.');
       setIsTyping(false);
       setIsLoading(false);
@@ -403,7 +437,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         <AnimatePresence>
-          {activeConversation?.messages.map((msg, index) => (
+          {activeConversation?.messages?.map((msg, index) => (
             <motion.div
               key={msg.id}
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -424,7 +458,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
                 <p className={`text-xs mt-2 ${
                   msg.sender === 'user' ? 'text-obsidian-600' : 'text-obsidian-400'
                 }`}>
-                  {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </motion.div>
             </motion.div>
