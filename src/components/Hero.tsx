@@ -30,26 +30,34 @@ const Hero: React.FC<HeroProps> = ({ onStartApp }) => {
           rel="noopener noreferrer"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          whileHover={{ scale: 1.05, rotate: 5 }}
+          transition={{ duration: 0.6, delay: 1 }}
+          whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           className="fixed top-6 right-6 z-50 group"
           title="Powered by Bolt.new"
         >
-          <div className="relative">
+          <div className="relative w-16 h-16">
             {/* Glow effect */}
-            <div className="absolute inset-0 rounded-full bg-white/20 blur-lg group-hover:bg-white/30 transition-all duration-300"></div>
+            <div className="absolute inset-0 rounded-full bg-white/30 blur-md group-hover:bg-white/50 transition-all duration-300 animate-pulse"></div>
             
-            {/* Badge container */}
-            <div className="relative w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center group-hover:shadow-xl transition-all duration-300">
-              {/* Bolt icon */}
-              <div className="text-black font-bold text-xl">⚡</div>
-            </div>
+            {/* Badge Image */}
+            <img 
+              src="/white_circle_360x360.png" 
+              alt="Powered by Bolt.new" 
+              className="relative w-full h-full rounded-full shadow-lg group-hover:shadow-xl transition-all duration-300"
+              onError={(e) => {
+                // Fallback if image doesn't load
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = target.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'flex';
+              }}
+            />
             
-            {/* Text overlay */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-black text-xs font-bold leading-tight">
-              <div className="mt-1">BOLT</div>
-              <div className="-mt-0.5">.NEW</div>
+            {/* Fallback badge if image fails to load */}
+            <div className="absolute inset-0 rounded-full bg-white shadow-lg flex-col items-center justify-center text-black text-xs font-bold leading-tight hidden group-hover:shadow-xl transition-all duration-300">
+              <div className="text-lg mb-1">⚡</div>
+              <div className="text-[8px] font-black">BOLT.NEW</div>
             </div>
           </div>
         </motion.a>
