@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { User } from '@supabase/supabase-js';
-import { supabase, signInWithEmail, signUpWithEmail, signOut } from '../lib/supabase';
+import { supabase, signInWithEmail, signUpWithEmail, signOut, isSupabaseConfigured } from '../lib/supabase';
 import { Database } from '../types/database';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -25,6 +25,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   initialize: async () => {
     try {
+      // Check if Supabase is configured
+      if (!isSupabaseConfigured()) {
+        console.warn('⚠️ Supabase not configured. Running in demo mode.');
+        set({ isLoading: false });
+        return;
+      }
+
       // Get current session
       const { data: { session }, error } = await supabase.auth.getSession();
       

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import Header from './components/Header';
@@ -13,7 +13,7 @@ import AppLayout from './components/AppLayout';
 import { useAuthStore } from './store/authStore';
 
 function App() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isLoading } = useAuthStore();
   const [showIntro, setShowIntro] = useState(true);
   const [showApp, setShowApp] = useState(false);
 
@@ -29,19 +29,34 @@ function App() {
     setShowApp(true);
   };
 
-  // Show intro page first
-  if (showIntro && !isAuthenticated) {
-    return <IntroPage onEnterApp={handleIntroComplete} />;
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-obsidian-950 flex items-center justify-center">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="w-12 h-12 rounded-xl bg-gradient-premium p-0.5"
+        >
+          <div className="w-full h-full rounded-xl bg-obsidian-800"></div>
+        </motion.div>
+      </div>
+    );
   }
 
-  // Show main app layout
-  if (showApp || isAuthenticated) {
+  // Show main app layout if authenticated
+  if (isAuthenticated) {
     return <AppLayout />;
   }
 
-  // Show landing page (fallback)
+  // Show intro page first for non-authenticated users
+  if (showIntro) {
+    return <IntroPage onEnterApp={handleIntroComplete} />;
+  }
+
+  // Show landing page with auth integration
   return (
-    <div className="min-h-screen bg-dark-500 overflow-x-hidden">
+    <div className="min-h-screen bg-obsidian-950 overflow-x-hidden">
       <Toaster 
         position="top-right"
         toastOptions={{

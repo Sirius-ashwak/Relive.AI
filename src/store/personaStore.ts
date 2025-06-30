@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Database } from '../types/database';
 import { useAuthStore } from './authStore';
 
@@ -26,7 +26,10 @@ export const usePersonaStore = create<PersonaState>((set, get) => ({
 
   fetchPersonas: async () => {
     const { user } = useAuthStore.getState();
-    if (!user) return;
+    if (!user || !isSupabaseConfigured()) {
+      console.warn('⚠️ Cannot fetch personas: User not authenticated or Supabase not configured');
+      return;
+    }
 
     set({ isLoading: true });
     try {
@@ -48,6 +51,10 @@ export const usePersonaStore = create<PersonaState>((set, get) => ({
   addPersona: async (personaData) => {
     const { user } = useAuthStore.getState();
     if (!user) throw new Error('User not authenticated');
+    
+    if (!isSupabaseConfigured()) {
+      throw new Error('Supabase not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file to enable persona creation.');
+    }
 
     try {
       const { data, error } = await supabase
@@ -71,6 +78,10 @@ export const usePersonaStore = create<PersonaState>((set, get) => ({
   },
 
   updatePersona: async (id, updates) => {
+    if (!isSupabaseConfigured()) {
+      throw new Error('Supabase not configured');
+    }
+
     try {
       const { data, error } = await supabase
         .from('personas')
@@ -94,6 +105,10 @@ export const usePersonaStore = create<PersonaState>((set, get) => ({
   },
 
   deletePersona: async (id) => {
+    if (!isSupabaseConfigured()) {
+      throw new Error('Supabase not configured');
+    }
+
     try {
       const { error } = await supabase
         .from('personas')

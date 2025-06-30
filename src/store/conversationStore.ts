@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { supabase } from '../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Database } from '../types/database';
 import { useAuthStore } from './authStore';
 
@@ -31,7 +31,10 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
 
   fetchConversations: async () => {
     const { user } = useAuthStore.getState();
-    if (!user) return;
+    if (!user || !isSupabaseConfigured()) {
+      console.warn('⚠️ Cannot fetch conversations: User not authenticated or Supabase not configured');
+      return;
+    }
 
     set({ isLoading: true });
     try {
@@ -72,6 +75,10 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
   createConversation: async (personaId: string, title?: string) => {
     const { user } = useAuthStore.getState();
     if (!user) throw new Error('User not authenticated');
+    
+    if (!isSupabaseConfigured()) {
+      throw new Error('Supabase not configured. Please add environment variables to enable conversations.');
+    }
 
     try {
       const { data, error } = await supabase
@@ -104,6 +111,10 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
   },
 
   addMessage: async (conversationId: string, messageData) => {
+    if (!isSupabaseConfigured()) {
+      throw new Error('Supabase not configured');
+    }
+
     try {
       const { data, error } = await supabase
         .from('messages')
@@ -155,6 +166,10 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
   },
 
   endConversation: async (conversationId) => {
+    if (!isSupabaseConfigured()) {
+      throw new Error('Supabase not configured');
+    }
+
     try {
       const { error } = await supabase
         .from('conversations')
