@@ -178,7 +178,7 @@ const PersonaGrid: React.FC<PersonaGridProps> = ({ onStartChat, onCreateMemory }
                 <span>Create New Memory</span>
                 <Sparkles className="w-5 h-5 text-aurora-400" />
               </motion.button>
-            </div>
+            </motion.div>
           </>
         )}
       </div>
