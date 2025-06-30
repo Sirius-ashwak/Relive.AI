@@ -4,34 +4,32 @@ import { motion } from 'framer-motion';
 const BoltBadge: React.FC = () => {
   const [imageError, setImageError] = useState(false);
 
-  // SVG version of the Bolt.new badge as fallback
+  // Enhanced SVG version of the Bolt.new badge
   const BoltSVG = () => (
     <svg 
       width="64" 
       height="64" 
-      viewBox="0 0 360 360" 
+      viewBox="0 0 64 64" 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
       className="w-full h-full"
     >
-      <circle cx="180" cy="180" r="180" fill="white"/>
-      <circle cx="180" cy="180" r="170" fill="black"/>
+      {/* White circle background */}
+      <circle cx="32" cy="32" r="32" fill="white"/>
+      
+      {/* Bolt icon */}
       <path 
-        d="M120 100 L200 100 L160 180 L240 180 L140 260 L180 180 L120 180 Z" 
-        fill="white"
+        d="M20 18 L36 18 L28 32 L44 32 L24 46 L32 32 L20 32 Z" 
+        fill="#FF6154"
       />
-      <path 
-        d="M60 60 Q60 40 80 40 L280 40 Q300 40 300 60 L300 260 Q300 280 280 280 L80 280 Q60 280 60 260 Z" 
-        fill="none" 
-        stroke="white" 
-        strokeWidth="2"
-      />
+      
+      {/* Text */}
       <text 
-        x="180" 
-        y="320" 
+        x="32" 
+        y="56" 
         textAnchor="middle" 
-        fill="white" 
-        fontSize="24" 
+        fill="#333" 
+        fontSize="8" 
         fontWeight="bold" 
         fontFamily="Arial, sans-serif"
       >
@@ -51,15 +49,15 @@ const BoltBadge: React.FC = () => {
       whileHover={{ scale: 1.1, y: -2 }}
       whileTap={{ scale: 0.95 }}
       className="fixed top-6 right-6 z-50 group cursor-pointer"
-      title="Powered by Bolt.new - Click to visit"
+      title="Built with Bolt.new - Click to visit"
     >
       <div className="relative w-16 h-16">
         {/* Enhanced glow effect */}
         <motion.div 
-          className="absolute inset-0 rounded-full bg-white/20 blur-lg"
+          className="absolute inset-0 rounded-full bg-white/30 blur-lg"
           animate={{ 
             scale: [1, 1.2, 1],
-            opacity: [0.3, 0.6, 0.3]
+            opacity: [0.4, 0.7, 0.4]
           }}
           transition={{ 
             duration: 2, 
@@ -68,38 +66,60 @@ const BoltBadge: React.FC = () => {
           }}
         />
         
-        {/* Outer ring */}
-        <div className="absolute inset-0 rounded-full border-2 border-white/30 group-hover:border-white/60 transition-all duration-300" />
+        {/* Outer ring with gradient */}
+        <div className="absolute inset-0 rounded-full border-2 border-white/40 group-hover:border-white/70 transition-all duration-300 bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm" />
         
         {/* Badge content */}
-        <div className="relative w-full h-full rounded-full bg-white shadow-2xl group-hover:shadow-white/20 transition-all duration-300 overflow-hidden">
+        <div className="relative w-full h-full rounded-full bg-white shadow-2xl group-hover:shadow-white/30 transition-all duration-300 overflow-hidden">
           {!imageError ? (
             <img 
               src="/white_circle_360x360.png" 
-              alt="Powered by Bolt.new" 
+              alt="Built with Bolt.new" 
               className="w-full h-full object-cover rounded-full"
-              onError={() => setImageError(true)}
+              onError={() => {
+                console.log('Bolt badge image failed to load, using SVG fallback');
+                setImageError(true);
+              }}
               onLoad={() => console.log('Bolt badge image loaded successfully')}
             />
           ) : (
-            <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="text-black text-2xl font-black mb-1">⚡</div>
-                <div className="text-black text-[8px] font-black leading-none">BOLT</div>
-                <div className="text-black text-[8px] font-black leading-none">.NEW</div>
-              </div>
+            <div className="w-full h-full bg-white rounded-full flex items-center justify-center p-2">
+              <BoltSVG />
             </div>
           )}
         </div>
         
         {/* Hover effect overlay */}
         <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-aurora-500/20 to-lavender-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
+        {/* Pulsing ring animation */}
+        <motion.div
+          className="absolute inset-0 rounded-full border-2 border-aurora-400/50"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.5, 0, 0.5],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
       </div>
       
-      {/* Tooltip */}
-      <div className="absolute top-full right-0 mt-2 px-3 py-1 bg-black/80 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-        Built with Bolt.new
-      </div>
+      {/* Enhanced Tooltip */}
+      <motion.div 
+        className="absolute top-full right-0 mt-3 px-3 py-2 bg-black/90 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap backdrop-blur-sm border border-white/20"
+        initial={{ y: -10, opacity: 0 }}
+        whileHover={{ y: 0, opacity: 1 }}
+      >
+        <div className="flex items-center space-x-2">
+          <div className="w-2 h-2 rounded-full bg-aurora-400"></div>
+          <span className="font-medium">Built with Bolt.new</span>
+        </div>
+        {/* Tooltip arrow */}
+        <div className="absolute -top-1 right-4 w-2 h-2 bg-black/90 border-l border-t border-white/20 transform rotate-45"></div>
+      </motion.div>
     </motion.a>
   );
 };
