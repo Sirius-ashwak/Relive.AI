@@ -272,48 +272,83 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
 
         {/* Hero Section */}
         <section className="relative min-h-screen flex items-center justify-center pt-20">
-          {/* Premium Animated Background */}
+          {/* Enhanced Premium Animated Background */}
           <div className="absolute inset-0 overflow-hidden">
+            {/* Base gradient */}
             <div className="absolute inset-0 bg-gradient-to-br from-obsidian-950 via-obsidian-900 to-obsidian-800" />
             
+            {/* Animated gradient orbs */}
+            <motion.div
+              animate={{ 
+                scale: [1, 1.2, 1],
+                opacity: [0.4, 0.7, 0.4],
+                x: [0, 50, 0],
+                y: [0, -30, 0]
+              }}
+              transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-gradient-to-r from-aurora-500/20 to-lavender-500/15 rounded-full blur-3xl"
+            />
+            <motion.div
+              animate={{ 
+                scale: [1.2, 1, 1.2],
+                opacity: [0.3, 0.6, 0.3],
+                x: [0, -40, 0],
+                y: [0, 40, 0]
+              }}
+              transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute bottom-1/3 right-1/3 w-[400px] h-[400px] bg-gradient-to-r from-coral-500/15 to-gold-500/10 rounded-full blur-3xl"
+            />
             <motion.div
               animate={{ 
                 scale: [1, 1.1, 1],
-                opacity: [0.3, 0.5, 0.3]
+                opacity: [0.2, 0.5, 0.2],
+                x: [0, 30, 0],
+                y: [0, -20, 0]
               }}
               transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute top-1/4 left-1/3 w-96 h-96 bg-gradient-to-r from-aurora-500/15 to-lavender-500/10 rounded-full blur-3xl"
-            />
-            <motion.div
-              animate={{ 
-                scale: [1.1, 1, 1.1],
-                opacity: [0.2, 0.4, 0.2]
-              }}
-              transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute bottom-1/3 right-1/3 w-80 h-80 bg-gradient-to-r from-coral-500/10 to-gold-500/8 rounded-full blur-3xl"
+              className="absolute top-1/2 right-1/4 w-[300px] h-[300px] bg-gradient-to-r from-lavender-500/15 to-sage-500/10 rounded-full blur-3xl"
             />
             
-            {/* Floating Particles */}
-            {[...Array(12)].map((_, i) => (
+            {/* Enhanced floating particles */}
+            {[...Array(20)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute w-1 h-1 bg-aurora-400/60 rounded-full"
                 style={{
-                  left: `${10 + i * 8}%`,
-                  top: `${20 + (i % 3) * 30}%`,
+                  left: `${5 + i * 4.5}%`,
+                  top: `${15 + (i % 4) * 20}%`,
                 }}
                 animate={{
-                  y: [-20, -40, -20],
-                  opacity: [0.3, 0.8, 0.3],
-                  scale: [0.5, 1, 0.5],
+                  y: [-30, -60, -30],
+                  opacity: [0.2, 0.8, 0.2],
+                  scale: [0.3, 1.2, 0.3],
                 }}
                 transition={{
-                  duration: 4 + i * 0.5,
+                  duration: 6 + i * 0.3,
                   repeat: Infinity,
-                  delay: i * 0.3,
+                  delay: i * 0.2,
+                  ease: "easeInOut"
                 }}
               />
             ))}
+
+            {/* Mesh gradient overlay */}
+            <motion.div
+              className="absolute inset-0 opacity-30"
+              animate={{
+                background: [
+                  'radial-gradient(circle at 20% 50%, rgba(14, 165, 233, 0.1) 0%, transparent 50%)',
+                  'radial-gradient(circle at 80% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 50%)',
+                  'radial-gradient(circle at 50% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%)',
+                  'radial-gradient(circle at 20% 50%, rgba(14, 165, 233, 0.1) 0%, transparent 50%)',
+                ],
+              }}
+              transition={{
+                duration: 20,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
           </div>
 
           <div className="relative z-10 text-center px-6 max-w-7xl mx-auto">
@@ -333,11 +368,15 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="font-manrope text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 leading-tight text-shadow-lg"
+              className="font-manrope text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 leading-tight"
             >
-              <span className="gradient-text">Talk to the Past.</span>
+              <span className="bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent bg-[length:200%_200%] animate-gradient-shift">
+                Talk to the Past.
+              </span>
               <br />
-              <span className="text-white">Shape Your Future.</span>
+              <span className="bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent bg-[length:200%_200%] animate-gradient-shift">
+                Shape Your Future.
+              </span>
             </motion.h1>
 
             <motion.p
@@ -433,7 +472,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
                   transition={{ duration: 0.8, delay: 1.6 + index * 0.1 }}
                   className="text-center"
                 >
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold gradient-text mb-1">
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent mb-1">
                     {stat.number}
                   </div>
                   <div className="text-obsidian-300 font-medium text-sm">
@@ -473,7 +512,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
               className="text-center mb-16"
             >
               <h2 className="font-manrope text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-shadow-lg">
-                <span className="gradient-text">Revolutionary</span>
+                <span className="bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">Revolutionary</span>
                 <br />
                 <span className="text-white">AI Technology</span>
               </h2>
@@ -547,7 +586,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
               <h2 className="font-manrope text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-shadow-lg">
                 <span className="text-white">Trusted by</span>
                 <br />
-                <span className="gradient-text">Thousands</span>
+                <span className="bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">Thousands</span>
               </h2>
               <p className="text-lg md:text-xl text-obsidian-200 max-w-3xl mx-auto leading-relaxed">
                 Real stories from people who've found healing, connection, and meaning through Relive.
@@ -577,7 +616,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
                       <span key={i}>
                         {part}
                         {i === 0 && (
-                          <span className="gradient-text font-semibold">
+                          <span className="bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent font-semibold">
                             {testimonials[currentStep].highlight}
                           </span>
                         )}
@@ -638,7 +677,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
               <h2 className="font-manrope text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-shadow-lg">
                 <span className="text-white">Choose Your</span>
                 <br />
-                <span className="gradient-text">Memory Journey</span>
+                <span className="bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">Memory Journey</span>
               </h2>
               <p className="text-lg md:text-xl text-obsidian-200 max-w-3xl mx-auto leading-relaxed">
                 Start preserving memories today with our flexible pricing plans designed for every need.
@@ -670,7 +709,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
                   <div className="text-center mb-8">
                     <h3 className="font-manrope text-2xl font-bold text-white mb-2">{plan.name}</h3>
                     <div className="flex items-baseline justify-center space-x-1 mb-4">
-                      <span className="text-4xl font-bold gradient-text">{plan.price}</span>
+                      <span className="text-4xl font-bold bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">{plan.price}</span>
                       <span className="text-obsidian-400">/{plan.period}</span>
                     </div>
                     <p className="text-obsidian-300 text-sm leading-relaxed">{plan.description}</p>
@@ -755,7 +794,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
               <h2 className="font-manrope text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-shadow-lg">
                 <span className="text-white">Begin Your</span>
                 <br />
-                <span className="gradient-text">Memory Journey</span>
+                <span className="bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">Memory Journey</span>
               </h2>
 
               <p className="text-lg md:text-xl text-obsidian-200 mb-10 leading-relaxed">
@@ -794,7 +833,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
                   <Brain className="w-6 h-6 text-white" />
                 </div>
               </div>
-              <span className="font-manrope font-bold text-xl gradient-text">
+              <span className="font-manrope font-bold text-xl bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">
                 Relive
               </span>
             </div>

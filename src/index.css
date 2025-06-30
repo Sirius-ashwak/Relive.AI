@@ -42,14 +42,14 @@
     transform: translateY(-2px);
   }
   
-  /* Apple-Style Gradient Text */
+  /* Enhanced Apple-Style Gradient Text */
   .gradient-text {
     background: linear-gradient(135deg, #0EA5E9 0%, #A855F7 50%, #F59E0B 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     background-size: 200% 200%;
-    animation: gradient-shift 3s ease infinite;
+    animation: gradient-shift 4s ease infinite;
   }
   
   /* Apple-Style Aurora Background */
@@ -209,10 +209,23 @@
   outline-offset: 2px;
 }
 
-/* Apple-Style Animations */
+/* Enhanced Apple-Style Animations */
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%, 100% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
+}
+
+@keyframes animate-gradient-shift {
+  0%, 100% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
 }
 
 @keyframes aurora-flow {
@@ -253,6 +266,11 @@
     opacity: 1;
     transform: scale(1.01);
   }
+}
+
+/* Enhanced gradient animation utility */
+.animate-gradient-shift {
+  animation: animate-gradient-shift 6s ease infinite;
 }
 
 /* Apple-Style Responsive Design */
@@ -307,6 +325,10 @@
   }
   
   .aurora-bg::before {
+    animation: none;
+  }
+  
+  .animate-gradient-shift {
     animation: none;
   }
 }
