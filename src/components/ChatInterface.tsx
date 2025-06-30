@@ -103,7 +103,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
       );
 
       // Simulate realistic typing delay
-      const typingDelay = Math.min(response.length * 50, 3000); // 50ms per character, max 3 seconds
+      const typingDelay = Math.min(response.length * 30, 2000); // 30ms per character, max 2 seconds
       
       setTimeout(() => {
         addMessage(activeConversation.id, {
@@ -120,7 +120,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
         });
         
         console.log('✅ Response added to conversation');
-      }, Math.max(typingDelay, 1000));
+      }, Math.max(typingDelay, 800));
       
     } catch (error) {
       console.error('❌ Error generating response:', error);
