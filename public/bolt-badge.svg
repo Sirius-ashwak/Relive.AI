@@ -1,0 +1,9 @@
+<svg width="360" height="360" viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="180" cy="180" r="180" fill="white"/>
+  <path d="M180 60C263.529 60 330 126.471 330 210C330 293.529 263.529 360 180 360C96.4711 360 30 293.529 30 210C30 126.471 96.4711 60 180 60Z" fill="black"/>
+  <path d="M120 150H180L150 210H210L180 270H120L150 210H90L120 150Z" fill="white"/>
+  <path d="M180 30C272.843 30 348 105.157 348 198C348 290.843 272.843 366 180 366C87.1573 366 12 290.843 12 198C12 105.157 87.1573 30 180 30ZM180 42C93.7258 42 24 111.726 24 198C24 284.274 93.7258 354 180 354C266.274 354 336 284.274 336 198C336 111.726 266.274 42 180 42Z" fill="white"/>
+  <text x="180" y="120" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">POWERED BY</text>
+  <text x="180" y="140" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold">BOLT.NEW</text>
+  <text x="180" y="320" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">MADE IN BOLT.NEW</text>
+</svg>
