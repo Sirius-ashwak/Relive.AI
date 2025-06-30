@@ -29,7 +29,8 @@
     "deploy": "npm run build && netlify deploy --prod --dir=dist",
     "deploy:preview": "npm run build && netlify deploy --dir=dist",
     "type-check": "tsc --noEmit",
-    "build:analyze": "npm run build && npx vite-bundle-analyzer dist/stats.html"
+    "build:analyze": "npm run build && npx vite-bundle-analyzer dist/stats.html",
+    "start": "npm run preview"
   },
   "dependencies": {
     "framer-motion": "^11.0.8",

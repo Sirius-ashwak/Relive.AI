@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: relive-memory-companion
+    env: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm run preview
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: NPM_VERSION
+        value: 8
+      - key: NODE_ENV
+        value: production
+    staticPublishPath: ./dist
