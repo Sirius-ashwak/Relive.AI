@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { isSupabaseConfigured } from '../lib/supabase';
 import toast from 'react-hot-toast';
 
 interface AuthModalProps {
@@ -122,9 +123,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   };
 
   const handleDemoLogin = async () => {
+    // Only allow demo login if Supabase is not configured
+    if (isSupabaseConfigured()) {
+      toast.error('Demo mode is not available when Supabase is configured. Please use your real credentials.');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // Use demo credentials that should work
+      // Use demo credentials that should work in demo mode
       await login('demo@relive.ai', 'demo123456');
       toast.success('Welcome to the demo!');
       onClose();
@@ -293,16 +300,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </motion.button>
         </form>
 
-        {/* Demo Button */}
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={handleDemoLogin}
-          disabled={isLoading}
-          className="w-full mt-4 px-6 py-3 glass glass-hover rounded-xl font-semibold text-white border border-white/20 hover:border-aurora-400/50 transition-all duration-300 disabled:opacity-50"
-        >
-          Try Demo Mode
-        </motion.button>
+        {/* Demo Button - Only show if Supabase is not configured */}
+        {!isSupabaseConfigured() && (
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleDemoLogin}
+            disabled={isLoading}
+            className="w-full mt-4 px-6 py-3 glass glass-hover rounded-xl font-semibold text-white border border-white/20 hover:border-aurora-400/50 transition-all duration-300 disabled:opacity-50"
+          >
+            Try Demo Mode
+          </motion.button>
+        )}
 
         {/* Switch Mode */}
         <div className="mt-8 text-center">

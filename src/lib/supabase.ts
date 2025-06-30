@@ -4,9 +4,21 @@ import { Database } from '../types/database';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Check if we have the required environment variables and they're not placeholder values
+const isSupabaseConfigured = () => {
+  return !!(
+    supabaseUrl && 
+    supabaseAnonKey && 
+    supabaseUrl !== 'your_supabase_project_url' && 
+    supabaseAnonKey !== 'your_supabase_anon_key' &&
+    supabaseUrl.includes('supabase.co') &&
+    supabaseAnonKey.length > 20
+  );
+};
+
 // Check if we have the required environment variables
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('⚠️ Supabase environment variables not found. Using demo mode.');
+if (!isSupabaseConfigured()) {
+  console.warn('⚠️ Supabase environment variables not found or are placeholder values. Using demo mode.');
   console.warn('To enable full functionality, add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file');
 }
 
@@ -28,7 +40,7 @@ const createMockClient = () => ({
   })
 });
 
-export const supabase = (supabaseUrl && supabaseAnonKey) 
+export const supabase = isSupabaseConfigured() 
   ? createClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: {
         autoRefreshToken: true,
@@ -40,7 +52,7 @@ export const supabase = (supabaseUrl && supabaseAnonKey)
 
 // Helper functions for common operations
 export const getCurrentUser = async () => {
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!isSupabaseConfigured()) {
     throw new Error('Supabase not configured. Please add environment variables.');
   }
   
@@ -50,7 +62,7 @@ export const getCurrentUser = async () => {
 };
 
 export const signOut = async () => {
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!isSupabaseConfigured()) {
     throw new Error('Supabase not configured. Please add environment variables.');
   }
   
@@ -59,7 +71,7 @@ export const signOut = async () => {
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!isSupabaseConfigured()) {
     throw new Error('Supabase not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file to enable authentication.');
   }
   
@@ -72,7 +84,7 @@ export const signInWithEmail = async (email: string, password: string) => {
 };
 
 export const signUpWithEmail = async (email: string, password: string, name: string) => {
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!isSupabaseConfigured()) {
     throw new Error('Supabase not configured. Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file to enable authentication.');
   }
   
@@ -89,7 +101,5 @@ export const signUpWithEmail = async (email: string, password: string, name: str
   return data;
 };
 
-// Check if Supabase is properly configured
-export const isSupabaseConfigured = () => {
-  return !!(supabaseUrl && supabaseAnonKey);
-};
+// Export the configuration check function
+export { isSupabaseConfigured };

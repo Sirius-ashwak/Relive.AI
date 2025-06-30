@@ -5,7 +5,7 @@ import { Persona, Message } from '../types';
 const genAI = new GoogleGenerativeAI(API_CONFIG.GEMINI_API_KEY);
 
 export class GeminiService {
-  private model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+  private model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
   async generatePersonaResponse(persona: Persona, userMessage: string, conversationHistory: Message[] = []): Promise<string> {
     try {

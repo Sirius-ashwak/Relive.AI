@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { User } from '../types';
 import { jsonDateReviver } from '../lib/utils';
+import { isSupabaseConfigured } from '../lib/supabase';
+import { v4 as uuidv4 } from 'uuid';
 
 interface AuthState {
   user: User | null;
@@ -14,15 +16,6 @@ interface AuthState {
   initializeUser: () => void;
 }
 
-// Check if Supabase is configured
-const isSupabaseConfigured = () => {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-  return supabaseUrl && supabaseKey && 
-         supabaseUrl !== 'your_supabase_project_url' && 
-         supabaseKey !== 'your_supabase_anon_key';
-};
-
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -31,17 +24,19 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
 
       initializeUser: () => {
-        // Create a default user for demo purposes
-        const defaultUser: User = {
-          id: 'demo-user-1',
-          email: 'demo@relive.ai',
-          name: 'Demo User',
-          subscription: 'free',
-          createdAt: new Date(),
-          avatar: '👤'
-        };
+        // Only create a demo user if Supabase is not configured
+        if (!isSupabaseConfigured()) {
+          const defaultUser: User = {
+            id: uuidv4(), // Use proper UUID for demo user
+            email: 'demo@relive.ai',
+            name: 'Demo User',
+            subscription: 'free',
+            createdAt: new Date(),
+            avatar: '👤'
+          };
 
-        set({ user: defaultUser, isAuthenticated: true });
+          set({ user: defaultUser, isAuthenticated: true });
+        }
       },
 
       login: async (email: string, password: string) => {
@@ -78,21 +73,21 @@ export const useAuthStore = create<AuthState>()(
               set({ user, isAuthenticated: true, isLoading: false });
               return;
             }
-          }
+          } else {
+            // Fallback to demo mode for specific demo credentials when Supabase is not configured
+            if (email === 'demo@relive.ai' && password === 'demo123456') {
+              const user: User = {
+                id: uuidv4(), // Use proper UUID for demo user
+                email: 'demo@relive.ai',
+                name: 'Demo User',
+                subscription: 'free',
+                createdAt: new Date(),
+                avatar: '👤'
+              };
 
-          // Fallback to demo mode for specific demo credentials
-          if (email === 'demo@relive.ai' && password === 'demo123456') {
-            const user: User = {
-              id: 'demo-user-1',
-              email: 'demo@relive.ai',
-              name: 'Demo User',
-              subscription: 'free',
-              createdAt: new Date(),
-              avatar: '👤'
-            };
-
-            set({ user, isAuthenticated: true, isLoading: false });
-            return;
+              set({ user, isAuthenticated: true, isLoading: false });
+              return;
+            }
           }
 
           // If not demo credentials and no Supabase, throw error
@@ -144,19 +139,19 @@ export const useAuthStore = create<AuthState>()(
               set({ user, isAuthenticated: true, isLoading: false });
               return;
             }
+          } else {
+            // Fallback to demo mode when Supabase is not configured
+            const user: User = {
+              id: uuidv4(), // Use proper UUID for demo user
+              email,
+              name,
+              subscription: 'free',
+              createdAt: new Date(),
+              avatar: '👤'
+            };
+
+            set({ user, isAuthenticated: true, isLoading: false });
           }
-
-          // Fallback to demo mode
-          const user: User = {
-            id: Date.now().toString(),
-            email,
-            name,
-            subscription: 'free',
-            createdAt: new Date(),
-            avatar: '👤'
-          };
-
-          set({ user, isAuthenticated: true, isLoading: false });
 
         } catch (error: any) {
           set({ isLoading: false });
@@ -194,11 +189,3 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
-
-// Initialize user on app start
-if (typeof window !== 'undefined') {
-  const store = useAuthStore.getState();
-  if (!store.isAuthenticated) {
-    store.initializeUser();
-  }
-}
