@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, User, Eye, EyeOff, Brain, Sparkles, AlertCircle } from 'lucide-react';
+import { X, Mail, Lock, User, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 
@@ -18,8 +18,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     name: ''
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { login, register, isLoading } = useAuthStore();
+  const { login, register } = useAuthStore();
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -36,7 +37,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (!isLogin && !formData.name.trim()) {
+    if (!isLogin && !formData.name) {
       newErrors.name = 'Name is required';
     }
 
@@ -47,52 +48,97 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    setErrors({});
 
     try {
       if (isLogin) {
         await login(formData.email, formData.password);
-        toast.success('Welcome back! 🎉');
+        toast.success('Welcome back!');
+        onClose();
       } else {
         await register(formData.email, formData.password, formData.name);
-        toast.success('Account created successfully! 🎉');
+        toast.success('Account created successfully!');
+        onClose();
       }
-      onClose();
-      resetForm();
     } catch (error: any) {
       console.error('Auth error:', error);
       
+      // Handle specific Supabase errors
       if (error.message?.includes('Invalid login credentials')) {
-        toast.error('Invalid email or password');
+        if (isLogin) {
+          setErrors({ 
+            general: 'Invalid email or password. Please check your credentials or sign up for a new account.' 
+          });
+        } else {
+          setErrors({ 
+            general: 'Unable to create account. Please try again.' 
+          });
+        }
       } else if (error.message?.includes('User already registered')) {
-        toast.error('An account with this email already exists');
+        setErrors({ 
+          general: 'An account with this email already exists. Please sign in instead.' 
+        });
+        setIsLogin(true);
       } else if (error.message?.includes('Email not confirmed')) {
-        toast.error('Please check your email and confirm your account');
-      } else if (error.message?.includes('Password should be at least 6 characters')) {
-        toast.error('Password must be at least 6 characters long');
+        setErrors({ 
+          general: 'Please check your email and click the confirmation link before signing in.' 
+        });
+      } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+        setErrors({ 
+          general: 'Connection error. Please check your internet connection and try again.' 
+        });
       } else {
-        toast.error(error.message || 'Authentication failed. Please try again.');
+        setErrors({ 
+          general: isLogin 
+            ? 'Sign in failed. Please check your credentials or create a new account.' 
+            : 'Account creation failed. Please try again.'
+        });
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
+    if (errors.general) {
+      setErrors(prev => ({ ...prev, general: '' }));
+    }
   };
 
-  const resetForm = () => {
-    setFormData({ email: '', password: '', name: '' });
+  const switchMode = () => {
+    setIsLogin(!isLogin);
     setErrors({});
-    setShowPassword(false);
+    setFormData({ email: '', password: '', name: '' });
   };
 
-  const handleClose = () => {
-    if (!isLoading) {
-      resetForm();
+  const handleDemoLogin = async () => {
+    setIsLoading(true);
+    try {
+      // Use demo credentials that should work
+      await login('demo@relive.ai', 'demo123456');
+      toast.success('Welcome to the demo!');
       onClose();
+    } catch (error) {
+      // If demo login fails, create a demo account
+      try {
+        await register('demo@relive.ai', 'demo123456', 'Demo User');
+        toast.success('Demo account created! Welcome!');
+        onClose();
+      } catch (registerError) {
+        toast.error('Demo mode unavailable. Please create your own account.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -104,7 +150,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-      onClick={(e) => e.target === e.currentTarget && handleClose()}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
@@ -114,83 +160,65 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-premium flex items-center justify-center">
-              <Brain className="w-6 h-6 text-obsidian-900" />
-            </div>
-            <div>
-              <h2 className="font-manrope text-2xl font-bold text-white">
-                {isLogin ? 'Welcome Back' : 'Join Relive'}
-              </h2>
-              <p className="text-obsidian-400 text-sm">
-                {isLogin ? 'Sign in to your account' : 'Create your account'}
-              </p>
-            </div>
+          <div>
+            <h2 className="font-manrope text-2xl font-bold text-white">
+              {isLogin ? 'Welcome Back' : 'Create Account'}
+            </h2>
+            <p className="text-obsidian-300 mt-1">
+              {isLogin ? 'Sign in to continue your journey' : 'Start your memory journey today'}
+            </p>
           </div>
           <button
-            onClick={handleClose}
-            disabled={isLoading}
-            className="p-2 rounded-xl glass glass-hover disabled:opacity-50"
+            onClick={onClose}
+            className="p-2 rounded-xl glass glass-hover"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Demo Info */}
-        <div className="mb-6 p-4 rounded-xl bg-aurora-500/10 border border-aurora-500/20">
-          <div className="flex items-center space-x-2 mb-2">
-            <Sparkles className="w-4 h-4 text-aurora-400" />
-            <p className="text-aurora-300 text-sm font-medium">Quick Start</p>
-          </div>
-          <p className="text-aurora-200 text-xs">
-            {isLogin 
-              ? 'Sign in to access your memory companions and continue conversations.'
-              : 'Create a free account to start building your first AI memory persona.'
-            }
-          </p>
-        </div>
+        {/* Error Message */}
+        <AnimatePresence>
+          {errors.general && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="mb-6 p-4 rounded-xl bg-coral-500/10 border border-coral-500/20 flex items-start space-x-3"
+            >
+              <AlertCircle className="w-5 h-5 text-coral-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-coral-400 font-medium text-sm">Authentication Error</p>
+                <p className="text-coral-300 text-sm mt-1">{errors.general}</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Name field (signup only) */}
-          <AnimatePresence>
-            {!isLogin && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <label className="block text-sm font-medium text-obsidian-300 mb-2">
-                  Full Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-obsidian-400" />
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Enter your full name"
-                    className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 border transition-all duration-300 text-white placeholder-obsidian-400 ${
-                      errors.name ? 'border-coral-500/50' : 'border-white/10 focus:border-aurora-400/50'
-                    } focus:outline-none`}
-                  />
-                </div>
-                {errors.name && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="text-coral-400 text-sm mt-1 flex items-center space-x-1"
-                  >
-                    <AlertCircle className="w-3 h-3" />
-                    <span>{errors.name}</span>
-                  </motion.p>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {!isLogin && (
+            <div>
+              <label className="block text-sm font-medium text-obsidian-300 mb-2">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-obsidian-400" />
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 border transition-all duration-300 text-white placeholder-obsidian-400 ${
+                    errors.name ? 'border-coral-500/50' : 'border-white/10 focus:border-aurora-400/50'
+                  }`}
+                  placeholder="Enter your full name"
+                />
+              </div>
+              {errors.name && (
+                <p className="text-coral-400 text-sm mt-1">{errors.name}</p>
+              )}
+            </div>
+          )}
 
-          {/* Email field */}
           <div>
             <label className="block text-sm font-medium text-obsidian-300 mb-2">
               Email Address
@@ -201,25 +229,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                placeholder="Enter your email"
                 className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 border transition-all duration-300 text-white placeholder-obsidian-400 ${
                   errors.email ? 'border-coral-500/50' : 'border-white/10 focus:border-aurora-400/50'
-                } focus:outline-none`}
+                }`}
+                placeholder="Enter your email"
               />
             </div>
             {errors.email && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-coral-400 text-sm mt-1 flex items-center space-x-1"
-              >
-                <AlertCircle className="w-3 h-3" />
-                <span>{errors.email}</span>
-              </motion.p>
+              <p className="text-coral-400 text-sm mt-1">{errors.email}</p>
             )}
           </div>
 
-          {/* Password field */}
           <div>
             <label className="block text-sm font-medium text-obsidian-300 mb-2">
               Password
@@ -230,10 +250,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
-                placeholder="Enter your password"
                 className={`w-full pl-12 pr-12 py-3 rounded-xl bg-white/5 border transition-all duration-300 text-white placeholder-obsidian-400 ${
                   errors.password ? 'border-coral-500/50' : 'border-white/10 focus:border-aurora-400/50'
-                } focus:outline-none`}
+                }`}
+                placeholder="Enter your password"
               />
               <button
                 type="button"
@@ -244,28 +264,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               </button>
             </div>
             {errors.password && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-coral-400 text-sm mt-1 flex items-center space-x-1"
-              >
-                <AlertCircle className="w-3 h-3" />
-                <span>{errors.password}</span>
-              </motion.p>
-            )}
-            {!isLogin && !errors.password && (
-              <p className="text-obsidian-400 text-xs mt-1">
-                Password must be at least 6 characters long
-              </p>
+              <p className="text-coral-400 text-sm mt-1">{errors.password}</p>
             )}
           </div>
 
-          {/* Submit button */}
           <motion.button
-            type="submit"
-            disabled={isLoading}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
+            type="submit"
+            disabled={isLoading}
             className="w-full btn-premium text-obsidian-900 font-bold py-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             {isLoading ? (
@@ -273,45 +280,52 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                >
-                  <Sparkles className="w-5 h-5" />
-                </motion.div>
+                  className="w-5 h-5 border-2 border-obsidian-900 border-t-transparent rounded-full"
+                />
                 <span>{isLogin ? 'Signing In...' : 'Creating Account...'}</span>
               </>
             ) : (
-              <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+              <>
+                <CheckCircle className="w-5 h-5" />
+                <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+              </>
             )}
           </motion.button>
         </form>
 
-        {/* Toggle between login/signup */}
-        <div className="mt-6 text-center">
-          <p className="text-obsidian-400 text-sm">
+        {/* Demo Button */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleDemoLogin}
+          disabled={isLoading}
+          className="w-full mt-4 px-6 py-3 glass glass-hover rounded-xl font-semibold text-white border border-white/20 hover:border-aurora-400/50 transition-all duration-300 disabled:opacity-50"
+        >
+          Try Demo Mode
+        </motion.button>
+
+        {/* Switch Mode */}
+        <div className="mt-8 text-center">
+          <p className="text-obsidian-400">
             {isLogin ? "Don't have an account?" : "Already have an account?"}
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setErrors({});
-                setFormData({ email: '', password: '', name: '' });
-              }}
-              disabled={isLoading}
-              className="ml-2 text-aurora-400 hover:text-aurora-300 font-medium transition-colors disabled:opacity-50"
-            >
-              {isLogin ? 'Sign up' : 'Sign in'}
-            </button>
           </p>
+          <button
+            type="button"
+            onClick={switchMode}
+            className="text-aurora-400 hover:text-aurora-300 font-semibold transition-colors mt-1"
+          >
+            {isLogin ? 'Create Account' : 'Sign In'}
+          </button>
         </div>
 
-        {/* Features preview */}
+        {/* Help Text */}
         <div className="mt-6 p-4 rounded-xl bg-white/5 border border-white/10">
-          <p className="text-white text-sm font-medium mb-2">What you'll get:</p>
-          <ul className="text-obsidian-300 text-xs space-y-1">
-            <li>• Create unlimited memory personas</li>
-            <li>• Have natural AI conversations</li>
-            <li>• Preserve memories forever</li>
-            <li>• Connect with past and future selves</li>
-          </ul>
+          <p className="text-obsidian-300 text-sm text-center">
+            {isLogin 
+              ? "New to Relive? Create an account to start preserving your memories."
+              : "Join thousands of users preserving their most precious memories."
+            }
+          </p>
         </div>
       </motion.div>
     </motion.div>

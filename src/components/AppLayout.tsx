@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import Sidebar from './Sidebar';
 import Dashboard from './Dashboard';
@@ -11,42 +11,40 @@ import MemoriesSection from './MemoriesSection';
 import TimelineSection from './TimelineSection';
 import MemoryCreator from './MemoryCreator';
 import ChatInterface from './ChatInterface';
-import { Database } from '../types/database';
-import { validateApiKeys, getApiKeyStatus } from '../config/api';
-import { usePersonaStore } from '../store/personaStore';
-import { useConversationStore } from '../store/conversationStore';
-import { AlertTriangle, CheckCircle } from 'lucide-react';
-
-type Persona = Database['public']['Tables']['personas']['Row'];
+import AuthModal from './AuthModal';
+import { Persona } from '../types';
+import { useAuthStore } from '../store/authStore';
+import toast from 'react-hot-toast';
 
 const AppLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showMemoryCreator, setShowMemoryCreator] = useState(false);
   const [activeChatPersona, setActiveChatPersona] = useState<Persona | null>(null);
-  const [apiStatus, setApiStatus] = useState<any>(null);
-  const [showApiWarning, setShowApiWarning] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  
+  const { isAuthenticated, user } = useAuthStore();
 
-  const { fetchPersonas } = usePersonaStore();
-  const { fetchConversations } = useConversationStore();
-
+  // Check authentication status and show modal if needed
   useEffect(() => {
-    // Check API key status on mount
-    const status = getApiKeyStatus();
-    setApiStatus(status);
-    
-    // Show warning if Gemini API key is missing
-    if (!status.gemini) {
-      setShowApiWarning(true);
-      setTimeout(() => setShowApiWarning(false), 10000); // Hide after 10 seconds
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
     }
+  }, [isAuthenticated]);
 
-    // Fetch data from Supabase
-    fetchPersonas();
-    fetchConversations();
-  }, [fetchPersonas, fetchConversations]);
+  // Show welcome message when user logs in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      toast.success(`Welcome back, ${user.name}!`);
+    }
+  }, [isAuthenticated, user]);
 
   const handleStartChat = (persona: Persona) => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      toast.error('Please sign in to start a conversation');
+      return;
+    }
     setActiveChatPersona(persona);
   };
 
@@ -55,6 +53,11 @@ const AppLayout: React.FC = () => {
   };
 
   const handleCreateMemory = () => {
+    if (!isAuthenticated) {
+      setShowAuthModal(true);
+      toast.error('Please sign in to create memories');
+      return;
+    }
     setShowMemoryCreator(true);
   };
 
@@ -78,50 +81,7 @@ const AppLayout: React.FC = () => {
         return (
           <div className="text-center py-20">
             <h2 className="text-2xl font-bold text-white mb-4">Help & Support</h2>
-            <p className="text-gray-400 mb-8">Get help with using Relive AI Memory Companion</p>
-            
-            <div className="max-w-2xl mx-auto space-y-6">
-              <div className="card-premium text-left">
-                <h3 className="font-semibold text-white mb-3">API Configuration</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    {apiStatus?.gemini ? (
-                      <CheckCircle className="w-4 h-4 text-sage-400" />
-                    ) : (
-                      <AlertTriangle className="w-4 h-4 text-coral-400" />
-                    )}
-                    <span className="text-sm">Gemini AI (Required for conversations)</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {apiStatus?.elevenlabs ? (
-                      <CheckCircle className="w-4 h-4 text-sage-400" />
-                    ) : (
-                      <AlertTriangle className="w-4 h-4 text-obsidian-400" />
-                    )}
-                    <span className="text-sm">ElevenLabs (Optional - Voice cloning)</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {apiStatus?.tavus ? (
-                      <CheckCircle className="w-4 h-4 text-sage-400" />
-                    ) : (
-                      <AlertTriangle className="w-4 h-4 text-obsidian-400" />
-                    )}
-                    <span className="text-sm">Tavus (Optional - Video avatars)</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card-premium text-left">
-                <h3 className="font-semibold text-white mb-3">Getting Started</h3>
-                <ol className="text-sm text-obsidian-300 space-y-2">
-                  <li>1. Set up your Supabase project and add credentials to .env</li>
-                  <li>2. Add your Gemini API key to the .env file</li>
-                  <li>3. Create your first memory persona</li>
-                  <li>4. Start having conversations</li>
-                  <li>5. Explore advanced features like voice and video</li>
-                </ol>
-              </div>
-            </div>
+            <p className="text-gray-400">Help documentation coming soon...</p>
           </div>
         );
       default:
@@ -130,19 +90,7 @@ const AppLayout: React.FC = () => {
   };
 
   if (activeChatPersona) {
-    return (
-      <AnimatePresence mode="wait">
-        <motion.div
-          key="chat"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: 0.3 }}
-        >
-          <ChatInterface persona={activeChatPersona} onClose={handleCloseChat} />
-        </motion.div>
-      </AnimatePresence>
-    );
+    return <ChatInterface persona={activeChatPersona} onClose={handleCloseChat} />;
   }
 
   return (
@@ -160,28 +108,6 @@ const AppLayout: React.FC = () => {
         }}
       />
 
-      {/* API Warning */}
-      <AnimatePresence>
-        {showApiWarning && !apiStatus?.gemini && (
-          <motion.div
-            initial={{ opacity: 0, y: -100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -100 }}
-            className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md"
-          >
-            <div className="bg-coral-500/20 border border-coral-500/50 rounded-xl p-4 backdrop-blur-xl">
-              <div className="flex items-center space-x-3">
-                <AlertTriangle className="w-5 h-5 text-coral-400 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-medium text-white">Setup Required</p>
-                  <p className="text-xs text-coral-200">Configure Supabase and API keys in .env</p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -198,28 +124,19 @@ const AppLayout: React.FC = () => {
         }`}
       >
         <div className="p-8">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {renderContent()}
-            </motion.div>
-          </AnimatePresence>
+          {renderContent()}
         </div>
       </motion.main>
 
-      <AnimatePresence>
-        {showMemoryCreator && (
-          <MemoryCreator 
-            isOpen={showMemoryCreator} 
-            onClose={() => setShowMemoryCreator(false)} 
-          />
-        )}
-      </AnimatePresence>
+      <MemoryCreator 
+        isOpen={showMemoryCreator} 
+        onClose={() => setShowMemoryCreator(false)} 
+      />
+
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+      />
     </div>
   );
 };
