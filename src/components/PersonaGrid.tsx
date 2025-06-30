@@ -43,18 +43,6 @@ const PersonaGrid: React.FC<PersonaGridProps> = ({ onStartChat, onCreateMemory }
     }
   };
 
-  const formatLastInteraction = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diffInDays === 0) return 'Today';
-    if (diffInDays === 1) return 'Yesterday';
-    if (diffInDays < 7) return `${diffInDays} days ago`;
-    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
-    return `${Math.floor(diffInDays / 30)} months ago`;
-  };
-
   if (isLoading) {
     return (
       <section className="py-24 px-6">
@@ -145,12 +133,8 @@ const PersonaGrid: React.FC<PersonaGridProps> = ({ onStartChat, onCreateMemory }
               {personas.map((persona) => (
                 <motion.div key={persona.id} variants={itemVariants}>
                   <PersonaCard
-                    name={persona.name}
-                    type={persona.type}
-                    lastInteraction={formatLastInteraction(persona.last_interaction)}
-                    avatar={persona.avatar}
-                    status={persona.status}
-                    onClick={() => onStartChat(persona)}
+                    persona={persona}
+                    onStartChat={onStartChat}
                   />
                 </motion.div>
               ))}

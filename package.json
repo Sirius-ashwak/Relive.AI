@@ -1,15 +1,35 @@
 {
   "name": "relive-memory-companion",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "Premium AI Memory Companion that lets you have sophisticated conversations with replicas of people you know and past versions of yourself.",
+  "keywords": ["ai", "memory", "companion", "conversation", "react", "typescript", "supabase"],
+  "author": "Built with Bolt.new",
+  "license": "MIT",
+  "homepage": "https://relive-memory-companion.netlify.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/relive-memory-companion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/relive-memory-companion/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "deploy": "npm run build && netlify deploy --prod --dir=dist",
+    "deploy:preview": "npm run build && netlify deploy --dir=dist",
+    "type-check": "tsc --noEmit",
+    "build:analyze": "npm run build && npx vite-bundle-analyzer dist/stats.html"
   },
   "dependencies": {
     "framer-motion": "^11.0.8",
@@ -45,7 +65,9 @@
     "react-virtualized-auto-sizer": "^1.0.20",
     "react-window": "^1.8.8",
     "workbox-window": "^7.0.0",
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.39.0",
+    "algosdk": "^2.7.0",
+    "web3.storage": "^4.5.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
