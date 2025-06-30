@@ -3,7 +3,7 @@ export const API_CONFIG = {
   REVENUECAT_SECRET: import.meta.env.VITE_REVENUECAT_SECRET || '',
   PICA_API_KEY: import.meta.env.VITE_PICA_API_KEY || '',
   EXPO_ACCESS_TOKEN: import.meta.env.VITE_EXPO_ACCESS_TOKEN || '',
-  TAVUS_API_KEY: import.meta.env.VITE_TAVUS_API_KEY || '',
+  TAVUS_API_KEY: import.meta.env.VITE_TAVUS_API_KEY || '1d64217da1314858a6e0e9ac24bb68f1',
   ELEVENLABS_API_KEY: import.meta.env.VITE_ELEVENLABS_API_KEY || ''
 };
 

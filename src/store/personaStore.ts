@@ -1,150 +1,122 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { Persona } from '../types';
-import { jsonDateReviver } from '../lib/utils';
+import { supabase } from '../lib/supabase';
+import { Database } from '../types/database';
+import { useAuthStore } from './authStore';
+
+type Persona = Database['public']['Tables']['personas']['Row'];
+type PersonaInsert = Database['public']['Tables']['personas']['Insert'];
+type PersonaUpdate = Database['public']['Tables']['personas']['Update'];
 
 interface PersonaState {
   personas: Persona[];
   activePersona: Persona | null;
   isLoading: boolean;
-  addPersona: (persona: Omit<Persona, 'id' | 'createdAt'>) => void;
-  updatePersona: (id: string, updates: Partial<Persona>) => void;
-  deletePersona: (id: string) => void;
+  fetchPersonas: () => Promise<void>;
+  addPersona: (persona: Omit<PersonaInsert, 'user_id'>) => Promise<void>;
+  updatePersona: (id: string, updates: PersonaUpdate) => Promise<void>;
+  deletePersona: (id: string) => Promise<void>;
   setActivePersona: (persona: Persona | null) => void;
   getPersonasByType: (type: Persona['type']) => Persona[];
-  initializeDefaultPersonas: () => void;
 }
 
-const createDefaultPersonas = (): Persona[] => [
-  {
-    id: '1',
-    userId: 'demo-user-1',
-    name: 'Mom (Age 45)',
-    type: 'memory',
-    avatar: '👩',
-    description: 'Your loving mother who always knew the right words to say',
-    personality: 'Warm, caring, wise, and always supportive. She has a gentle way of giving advice and making you feel loved.',
-    status: 'active',
-    lastInteraction: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    conversationCount: 23,
-    memoryData: {
-      traits: ['caring', 'wise', 'patient', 'loving'],
-      memories: ['bedtime stories', 'cooking together', 'life advice'],
-      relationships: ['mother-child bond', 'family traditions']
-    },
-    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-  },
-  {
-    id: '2',
-    userId: 'demo-user-1',
-    name: 'You at 16',
-    type: 'younger',
-    avatar: '🧑',
-    description: 'Your teenage self, full of dreams and curiosity',
-    personality: 'Energetic, curious, sometimes rebellious, full of dreams and aspirations. Asks lots of questions about the future.',
-    status: 'learning',
-    lastInteraction: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-    conversationCount: 15,
-    memoryData: {
-      traits: ['curious', 'energetic', 'dreamy', 'ambitious'],
-      memories: ['high school', 'first crush', 'future plans'],
-      relationships: ['friends', 'family', 'teachers'],
-      goals: ['graduate', 'go to college', 'change the world'],
-      timeContext: 'teenage years'
-    },
-    createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000)
-  },
-  {
-    id: '3',
-    userId: 'demo-user-1',
-    name: 'Future You (35)',
-    type: 'future',
-    avatar: '👨‍💼',
-    description: 'Your successful future self with wisdom and experience',
-    personality: 'Confident, wise, successful, and grounded. Offers practical advice based on experience and achievement.',
-    status: 'active',
-    lastInteraction: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    conversationCount: 31,
-    memoryData: {
-      traits: ['confident', 'wise', 'successful', 'balanced'],
-      memories: ['career achievements', 'life lessons', 'relationships'],
-      relationships: ['professional network', 'life partner', 'mentees'],
-      goals: ['mentor others', 'build legacy', 'enjoy life'],
-      timeContext: 'successful future'
-    },
-    createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000)
-  }
-];
+export const usePersonaStore = create<PersonaState>((set, get) => ({
+  personas: [],
+  activePersona: null,
+  isLoading: false,
 
-export const usePersonaStore = create<PersonaState>()(
-  persist(
-    (set, get) => ({
-      personas: [],
-      activePersona: null,
-      isLoading: false,
+  fetchPersonas: async () => {
+    const { user } = useAuthStore.getState();
+    if (!user) return;
 
-      initializeDefaultPersonas: () => {
-        const { personas } = get();
-        if (personas.length === 0) {
-          set({ personas: createDefaultPersonas() });
-        }
-      },
+    set({ isLoading: true });
+    try {
+      const { data, error } = await supabase
+        .from('personas')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
-      addPersona: (personaData) => {
-        const newPersona: Persona = {
-          ...personaData,
-          id: Date.now().toString(),
-          createdAt: new Date()
-        };
-        set(state => ({ personas: [...state.personas, newPersona] }));
-      },
+      if (error) throw error;
 
-      updatePersona: (id, updates) => {
-        set(state => ({
-          personas: state.personas.map(persona =>
-            persona.id === id ? { ...persona, ...updates } : persona
-          )
-        }));
-      },
-
-      deletePersona: (id) => {
-        set(state => ({
-          personas: state.personas.filter(persona => persona.id !== id),
-          activePersona: state.activePersona?.id === id ? null : state.activePersona
-        }));
-      },
-
-      setActivePersona: (persona) => {
-        set({ activePersona: persona });
-      },
-
-      getPersonasByType: (type) => {
-        return get().personas.filter(persona => persona.type === type);
-      }
-    }),
-    {
-      name: 'persona-storage',
-      deserialize: (str) => {
-        try {
-          return JSON.parse(str, jsonDateReviver);
-        } catch {
-          return { state: { personas: [], activePersona: null, isLoading: false } };
-        }
-      },
-      onRehydrateStorage: () => (state) => {
-        // Initialize default personas if none exist
-        if (state && state.personas.length === 0) {
-          state.initializeDefaultPersonas();
-        }
-      }
+      set({ personas: data || [], isLoading: false });
+    } catch (error) {
+      console.error('Error fetching personas:', error);
+      set({ isLoading: false });
     }
-  )
-);
+  },
 
-// Initialize default personas on app start
-if (typeof window !== 'undefined') {
-  const store = usePersonaStore.getState();
-  if (store.personas.length === 0) {
-    store.initializeDefaultPersonas();
+  addPersona: async (personaData) => {
+    const { user } = useAuthStore.getState();
+    if (!user) throw new Error('User not authenticated');
+
+    try {
+      const { data, error } = await supabase
+        .from('personas')
+        .insert({
+          ...personaData,
+          user_id: user.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      set(state => ({
+        personas: [data, ...state.personas]
+      }));
+    } catch (error) {
+      console.error('Error adding persona:', error);
+      throw error;
+    }
+  },
+
+  updatePersona: async (id, updates) => {
+    try {
+      const { data, error } = await supabase
+        .from('personas')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      set(state => ({
+        personas: state.personas.map(persona =>
+          persona.id === id ? data : persona
+        ),
+        activePersona: state.activePersona?.id === id ? data : state.activePersona
+      }));
+    } catch (error) {
+      console.error('Error updating persona:', error);
+      throw error;
+    }
+  },
+
+  deletePersona: async (id) => {
+    try {
+      const { error } = await supabase
+        .from('personas')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      set(state => ({
+        personas: state.personas.filter(persona => persona.id !== id),
+        activePersona: state.activePersona?.id === id ? null : state.activePersona
+      }));
+    } catch (error) {
+      console.error('Error deleting persona:', error);
+      throw error;
+    }
+  },
+
+  setActivePersona: (persona) => {
+    set({ activePersona: persona });
+  },
+
+  getPersonasByType: (type) => {
+    return get().personas.filter(persona => persona.type === type);
   }
-}
+}));

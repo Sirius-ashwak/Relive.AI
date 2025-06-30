@@ -11,9 +11,13 @@ import MemoriesSection from './MemoriesSection';
 import TimelineSection from './TimelineSection';
 import MemoryCreator from './MemoryCreator';
 import ChatInterface from './ChatInterface';
-import { Persona } from '../types';
+import { Database } from '../types/database';
 import { validateApiKeys, getApiKeyStatus } from '../config/api';
+import { usePersonaStore } from '../store/personaStore';
+import { useConversationStore } from '../store/conversationStore';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
+
+type Persona = Database['public']['Tables']['personas']['Row'];
 
 const AppLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -22,6 +26,9 @@ const AppLayout: React.FC = () => {
   const [activeChatPersona, setActiveChatPersona] = useState<Persona | null>(null);
   const [apiStatus, setApiStatus] = useState<any>(null);
   const [showApiWarning, setShowApiWarning] = useState(false);
+
+  const { fetchPersonas } = usePersonaStore();
+  const { fetchConversations } = useConversationStore();
 
   useEffect(() => {
     // Check API key status on mount
@@ -33,7 +40,11 @@ const AppLayout: React.FC = () => {
       setShowApiWarning(true);
       setTimeout(() => setShowApiWarning(false), 10000); // Hide after 10 seconds
     }
-  }, []);
+
+    // Fetch data from Supabase
+    fetchPersonas();
+    fetchConversations();
+  }, [fetchPersonas, fetchConversations]);
 
   const handleStartChat = (persona: Persona) => {
     setActiveChatPersona(persona);
@@ -103,10 +114,11 @@ const AppLayout: React.FC = () => {
               <div className="card-premium text-left">
                 <h3 className="font-semibold text-white mb-3">Getting Started</h3>
                 <ol className="text-sm text-obsidian-300 space-y-2">
-                  <li>1. Add your Gemini API key to the .env file</li>
-                  <li>2. Create your first memory persona</li>
-                  <li>3. Start having conversations</li>
-                  <li>4. Explore advanced features like voice and video</li>
+                  <li>1. Set up your Supabase project and add credentials to .env</li>
+                  <li>2. Add your Gemini API key to the .env file</li>
+                  <li>3. Create your first memory persona</li>
+                  <li>4. Start having conversations</li>
+                  <li>5. Explore advanced features like voice and video</li>
                 </ol>
               </div>
             </div>
@@ -161,8 +173,8 @@ const AppLayout: React.FC = () => {
               <div className="flex items-center space-x-3">
                 <AlertTriangle className="w-5 h-5 text-coral-400 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-medium text-white">API Key Required</p>
-                  <p className="text-xs text-coral-200">Add your Gemini API key to .env for full functionality</p>
+                  <p className="text-sm font-medium text-white">Setup Required</p>
+                  <p className="text-xs text-coral-200">Configure Supabase and API keys in .env</p>
                 </div>
               </div>
             </div>
