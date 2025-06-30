@@ -38,11 +38,24 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
 
     set({ isLoading: true });
     try {
-      // Fetch conversations with their messages
+      // First, get the user's profile to get the correct profile ID
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError);
+        set({ isLoading: false });
+        return;
+      }
+
+      // Fetch conversations with their messages using the profile ID
       const { data: conversations, error: convError } = await supabase
         .from('conversations')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', profile.id)
         .order('last_message_at', { ascending: false });
 
       if (convError) throw convError;
@@ -81,11 +94,20 @@ export const useConversationStore = create<ConversationState>((set, get) => ({
     }
 
     try {
+      // Get the user's profile ID
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
       const { data, error } = await supabase
         .from('conversations')
         .insert({
           persona_id: personaId,
-          user_id: user.id,
+          user_id: profile.id,
           title: title || `Conversation ${new Date().toLocaleDateString()}`
         })
         .select()
