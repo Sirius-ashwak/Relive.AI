@@ -9,6 +9,7 @@ import { Database } from '../types/database';
 import toast from 'react-hot-toast';
 
 type Persona = Database['public']['Tables']['personas']['Row'];
+type Message = Database['public']['Tables']['messages']['Row'];
 
 interface ChatInterfaceProps {
   persona: Persona;
@@ -33,43 +34,49 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
     createConversation, 
     addMessage, 
     setActiveConversation,
-    conversations
+    conversations,
+    fetchConversations
   } = useConversationStore();
 
   useEffect(() => {
     if (user && persona) {
       console.log('🎬 Starting conversation with:', persona.name);
       
-      // Check if there's an existing active conversation for this persona
-      const existingConversation = conversations.find(
-        conv => conv.persona_id === persona.id && conv.is_active
-      );
-      
-      if (existingConversation) {
-        console.log('📱 Using existing conversation:', existingConversation.id);
-        setActiveConversation(existingConversation);
-      } else {
-        // Create new conversation
-        console.log('🆕 Creating new conversation');
-        createConversation(persona.id, `Chat with ${persona.name}`)
-          .then(conversationId => {
-            console.log('✅ Created conversation:', conversationId);
-            
-            // Add welcome message after a short delay
-            setTimeout(() => {
-              addMessage(conversationId, {
-                content: getWelcomeMessage(persona),
-                sender: 'persona'
-              });
-            }, 1000);
-          })
-          .catch(error => {
-            console.error('❌ Error creating conversation:', error);
-            toast.error('Failed to start conversation');
-          });
-      }
+      // Fetch conversations first
+      fetchConversations().then(() => {
+        // Check if there's an existing active conversation for this persona
+        const existingConversation = conversations.find(
+          conv => conv.persona_id === persona.id && conv.is_active
+        );
+        
+        if (existingConversation) {
+          console.log('📱 Using existing conversation:', existingConversation.id);
+          setActiveConversation(existingConversation);
+        } else {
+          // Create new conversation
+          console.log('🆕 Creating new conversation');
+          createConversation(persona.id, `Chat with ${persona.name}`)
+            .then(conversationId => {
+              console.log('✅ Created conversation:', conversationId);
+              
+              // Add welcome message after a short delay
+              setTimeout(() => {
+                addMessage(conversationId, {
+                  content: getWelcomeMessage(persona),
+                  sender: 'persona'
+                }).catch(error => {
+                  console.error('❌ Error adding welcome message:', error);
+                });
+              }, 1000);
+            })
+            .catch(error => {
+              console.error('❌ Error creating conversation:', error);
+              toast.error('Failed to start conversation');
+            });
+        }
+      });
     }
-  }, [persona, user, createConversation, addMessage, setActiveConversation, conversations]);
+  }, [persona, user, createConversation, addMessage, setActiveConversation, fetchConversations]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -122,10 +129,40 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ persona, onClose }) => {
       
       // Generate AI response
       console.log('🤖 Generating AI response...');
+      
+      // Convert database messages to the format expected by geminiService
+      const conversationHistory = (activeConversation.messages || []).map(msg => ({
+        id: msg.id,
+        conversationId: msg.conversation_id,
+        content: msg.content,
+        sender: msg.sender as 'user' | 'persona',
+        timestamp: new Date(msg.created_at)
+      }));
+
       const response = await geminiService.generatePersonaResponse(
-        persona,
+        {
+          id: persona.id,
+          userId: persona.user_id,
+          name: persona.name,
+          type: persona.type,
+          avatar: persona.avatar,
+          description: persona.description,
+          personality: persona.personality,
+          status: persona.status,
+          lastInteraction: new Date(persona.last_interaction),
+          conversationCount: persona.conversation_count,
+          memoryData: {
+            traits: persona.memory_data.traits,
+            memories: persona.memory_data.memories,
+            relationships: persona.memory_data.relationships,
+            goals: persona.memory_data.goals || [],
+            timeContext: persona.memory_data.timeContext || '',
+            backstory: persona.memory_data.backstory || ''
+          },
+          createdAt: new Date(persona.created_at)
+        },
         userMessage,
-        activeConversation.messages || []
+        conversationHistory
       );
 
       // Simulate realistic typing delay

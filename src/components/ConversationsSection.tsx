@@ -1,33 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, Search, Filter, Clock, MoreVertical, Star, Archive } from 'lucide-react';
 import { useConversationStore } from '../store/conversationStore';
 import { usePersonaStore } from '../store/personaStore';
-import { Persona } from '../types';
+import { useAuthStore } from '../store/authStore';
+import { Database } from '../types/database';
+
+type Persona = Database['public']['Tables']['personas']['Row'];
+type ConversationWithMessages = Database['public']['Tables']['conversations']['Row'] & {
+  messages: Database['public']['Tables']['messages']['Row'][];
+};
 
 interface ConversationsSectionProps {
   onStartChat: (persona: Persona) => void;
 }
 
 const ConversationsSection: React.FC<ConversationsSectionProps> = ({ onStartChat }) => {
-  const { conversations } = useConversationStore();
-  const { personas } = usePersonaStore();
+  const { conversations, isLoading, fetchConversations } = useConversationStore();
+  const { personas, fetchPersonas } = usePersonaStore();
+  const { user } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'active' | 'archived'>('all');
+
+  useEffect(() => {
+    if (user) {
+      fetchConversations();
+      fetchPersonas();
+    }
+  }, [user, fetchConversations, fetchPersonas]);
 
   const getPersonaById = (id: string) => personas.find(p => p.id === id);
 
   const filteredConversations = conversations
     .filter(conv => {
-      const persona = getPersonaById(conv.personaId);
+      const persona = getPersonaById(conv.persona_id);
       const matchesSearch = persona?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            conv.title.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesFilter = filterType === 'all' || 
-                           (filterType === 'active' && conv.isActive) ||
-                           (filterType === 'archived' && !conv.isActive);
+                           (filterType === 'active' && conv.is_active) ||
+                           (filterType === 'archived' && !conv.is_active);
       return matchesSearch && matchesFilter;
     })
-    .sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime());
+    .sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
 
   const formatDuration = (minutes: number) => {
     if (minutes < 60) return `${minutes}m`;
@@ -36,7 +50,8 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ onStartChat
     return `${hours}h ${mins}m`;
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
     const now = new Date();
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
     
@@ -48,6 +63,31 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ onStartChat
       return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="text-center">
+          <h1 className="font-manrope text-3xl font-bold mb-3">
+            <span className="gradient-text">Loading Conversations...</span>
+          </h1>
+        </div>
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="bg-white/5 backdrop-blur-xl rounded-xl p-6 border border-white/10 animate-pulse">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 rounded-xl bg-white/10"></div>
+                <div className="flex-1">
+                  <div className="h-4 bg-white/10 rounded mb-2"></div>
+                  <div className="h-3 bg-white/5 rounded w-1/2"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -110,19 +150,19 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ onStartChat
         </div>
         <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/10 text-center">
           <div className="text-xl font-bold text-coral-400 mb-1">
-            {conversations.filter(c => c.isActive).length}
+            {conversations.filter(c => c.is_active).length}
           </div>
           <div className="text-xs text-obsidian-400">Active</div>
         </div>
         <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/10 text-center">
           <div className="text-xl font-bold text-lavender-400 mb-1">
-            {conversations.reduce((acc, c) => acc + c.messages.length, 0)}
+            {conversations.reduce((acc, c) => acc + (c.messages?.length || 0), 0)}
           </div>
           <div className="text-xs text-obsidian-400">Messages</div>
         </div>
         <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 border border-white/10 text-center">
           <div className="text-xl font-bold text-sage-400 mb-1">
-            {formatDuration(conversations.reduce((acc, c) => acc + c.duration, 0))}
+            {formatDuration(conversations.reduce((acc, c) => acc + (c.duration || 0), 0))}
           </div>
           <div className="text-xs text-obsidian-400">Time</div>
         </div>
@@ -150,10 +190,10 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ onStartChat
         ) : (
           <div className="space-y-3">
             {filteredConversations.map((conversation, index) => {
-              const persona = getPersonaById(conversation.personaId);
+              const persona = getPersonaById(conversation.persona_id);
               if (!persona) return null;
 
-              const lastMessage = conversation.messages[conversation.messages.length - 1];
+              const lastMessage = conversation.messages?.[conversation.messages.length - 1];
 
               return (
                 <motion.div
@@ -172,7 +212,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ onStartChat
                           {persona.avatar}
                         </div>
                       </div>
-                      {conversation.isActive && (
+                      {conversation.is_active && (
                         <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-sage-400 border-2 border-obsidian-950" />
                       )}
                     </div>
@@ -183,7 +223,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ onStartChat
                           {persona.name}
                         </h3>
                         <span className="text-sm text-obsidian-400 flex-shrink-0 ml-2">
-                          {formatDate(conversation.lastMessageAt)}
+                          {formatDate(conversation.last_message_at)}
                         </span>
                       </div>
                       
@@ -199,11 +239,11 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ onStartChat
                       <div className="flex items-center space-x-4 mt-2 text-xs text-obsidian-500">
                         <span className="flex items-center space-x-1">
                           <MessageCircle className="w-3 h-3" />
-                          <span>{conversation.messages.length}</span>
+                          <span>{conversation.messages?.length || 0}</span>
                         </span>
                         <span className="flex items-center space-x-1">
                           <Clock className="w-3 h-3" />
-                          <span>{formatDuration(conversation.duration)}</span>
+                          <span>{formatDuration(conversation.duration || 0)}</span>
                         </span>
                         <span className="flex items-center space-x-1">
                           <Star className="w-3 h-3" />
