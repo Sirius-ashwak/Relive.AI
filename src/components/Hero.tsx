@@ -24,7 +24,7 @@ const Hero: React.FC<HeroProps> = ({ onStartApp }) => {
   return (
     <>
       <section className="relative min-h-screen flex items-center justify-center aurora-bg overflow-hidden">
-        {/* Bolt.new Badge */}
+        {/* Bolt.new Badge - Now visible on home page */}
         <BoltBadge />
 
         {/* Premium Floating Elements */}
