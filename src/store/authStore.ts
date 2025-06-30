@@ -67,13 +67,52 @@ export const useAuthStore = create<AuthState>()(
             }
 
             if (data.user) {
+              // Check if profile exists in profiles table
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', data.user.id)
+                .single();
+
+              let profile = profileData;
+
+              // If profile doesn't exist, create it
+              if (profileError && profileError.code === 'PGRST116') {
+                const newProfile = {
+                  id: data.user.id,
+                  email: data.user.email || email,
+                  name: data.user.user_metadata?.name || email.split('@')[0],
+                  avatar: '👤',
+                  subscription: 'free',
+                  preferences: {
+                    theme: 'dark',
+                    autoSave: true,
+                    notifications: true
+                  }
+                };
+
+                const { data: insertedProfile, error: insertError } = await supabase
+                  .from('profiles')
+                  .insert(newProfile)
+                  .select()
+                  .single();
+
+                if (insertError) {
+                  throw new Error(`Failed to create profile: ${insertError.message}`);
+                }
+
+                profile = insertedProfile;
+              } else if (profileError) {
+                throw new Error(`Failed to fetch profile: ${profileError.message}`);
+              }
+
               const user: User = {
-                id: data.user.id,
-                email: data.user.email || email,
-                name: data.user.user_metadata?.name || email.split('@')[0],
-                subscription: 'free',
-                createdAt: new Date(data.user.created_at),
-                avatar: '👤'
+                id: profile.id,
+                email: profile.email,
+                name: profile.name,
+                subscription: profile.subscription || 'free',
+                createdAt: new Date(profile.created_at),
+                avatar: profile.avatar || '👤'
               };
 
               set({ user, isAuthenticated: true, isLoading: false });
@@ -133,13 +172,41 @@ export const useAuthStore = create<AuthState>()(
             }
 
             if (data.user) {
-              const user: User = {
+              // Create profile in profiles table
+              const newProfile = {
                 id: data.user.id,
                 email: data.user.email || email,
                 name: name,
+                avatar: '👤',
                 subscription: 'free',
-                createdAt: new Date(data.user.created_at),
-                avatar: '👤'
+                preferences: {
+                  theme: 'dark',
+                  autoSave: true,
+                  notifications: true
+                }
+              };
+
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .insert(newProfile)
+                .select()
+                .single();
+
+              if (profileError) {
+                // If profile creation fails, we should still handle the case gracefully
+                console.error('Profile creation error:', profileError);
+                // Don't throw here as the user is already created in auth
+              }
+
+              const profile = profileData || newProfile;
+
+              const user: User = {
+                id: profile.id,
+                email: profile.email,
+                name: profile.name,
+                subscription: profile.subscription || 'free',
+                createdAt: new Date(profile.created_at || new Date()),
+                avatar: profile.avatar || '👤'
               };
 
               set({ user, isAuthenticated: true, isLoading: false });
