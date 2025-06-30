@@ -69,7 +69,7 @@ export default defineConfig({
         drop_debugger: true,
       },
     },
-    sourcemap: true, // Enable source maps for debugging
+    sourcemap: false, // Disable source maps for production
   },
   server: {
     port: 5173,
@@ -83,4 +83,5 @@ export default defineConfig({
     // Ensure environment variables are properly defined
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
+  base: './', // Use relative paths for deployment
 });
