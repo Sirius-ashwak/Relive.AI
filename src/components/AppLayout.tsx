@@ -109,7 +109,7 @@ const AppLayout: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => toast.info('Help documentation coming soon!')}
+              onClick={() => toast('Help documentation coming soon!')}
               className="btn-premium text-obsidian-900 font-bold"
             >
               Contact Support
@@ -176,7 +176,7 @@ const AppLayout: React.FC = () => {
         isOpen={showMemoryCreator} 
         onClose={() => {
           setShowMemoryCreator(false);
-          toast.info('Memory creator closed');
+          toast('Memory creator closed');
         }} 
       />
 
