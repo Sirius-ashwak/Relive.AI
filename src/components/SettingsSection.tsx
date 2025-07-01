@@ -9,7 +9,9 @@ import {
   Download,
   Trash2,
   Key,
-  Database
+  Database,
+  Check,
+  X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -76,7 +78,7 @@ const SettingsSection: React.FC = () => {
         [setting]: !(prev[category] as any)[setting]
       }
     }));
-    toast.success('Setting updated');
+    toast.success('Setting updated successfully!');
   };
 
   const handleSliderChange = (value: number) => {
@@ -93,15 +95,21 @@ const SettingsSection: React.FC = () => {
     <motion.button
       whileTap={{ scale: 0.95 }}
       onClick={onToggle}
-      className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
-        enabled ? 'bg-gradient-aurora' : 'bg-gray-600'
+      className={`relative w-12 h-6 rounded-full transition-all duration-300 ${
+        enabled ? 'bg-gradient-premium' : 'bg-obsidian-600'
       }`}
     >
       <motion.div
         animate={{ x: enabled ? 24 : 2 }}
         transition={{ type: "spring", stiffness: 500, damping: 30 }}
-        className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg"
-      />
+        className="absolute top-1 w-4 h-4 bg-white rounded-full shadow-lg flex items-center justify-center"
+      >
+        {enabled ? (
+          <Check className="w-2 h-2 text-aurora-500" />
+        ) : (
+          <X className="w-2 h-2 text-obsidian-400" />
+        )}
+      </motion.div>
     </motion.button>
   );
 
@@ -155,10 +163,10 @@ const SettingsSection: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <h1 className="font-sora text-4xl font-bold mb-4">
+        <h1 className="font-manrope text-3xl font-bold mb-3">
           <span className="gradient-text">Settings</span>
         </h1>
-        <p className="text-xl text-gray-300">
+        <p className="text-lg text-obsidian-300">
           Customize your Relive experience
         </p>
       </motion.div>
@@ -171,50 +179,62 @@ const SettingsSection: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 + sectionIndex * 0.1 }}
-            className="p-6 rounded-2xl glass glass-hover"
+            className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
           >
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-aurora p-0.5">
-                <div className="w-full h-full rounded-xl bg-dark-400 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-premium p-0.5">
+                <div className="w-full h-full rounded-xl bg-obsidian-800 flex items-center justify-center">
                   <section.icon className="w-5 h-5 text-white" />
                 </div>
               </div>
-              <h2 className="font-sora text-xl font-semibold text-white">{section.title}</h2>
+              <h2 className="font-manrope text-xl font-semibold text-white">{section.title}</h2>
             </div>
 
             <div className="space-y-4">
               {section.items.map((item) => (
-                <div key={item.key} className="flex items-center justify-between p-4 rounded-xl glass">
+                <motion.div 
+                  key={item.key} 
+                  className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300"
+                  whileHover={{ scale: 1.01 }}
+                >
                   <div>
                     <h3 className="font-medium text-white">{item.label}</h3>
-                    <p className="text-sm text-gray-400">{item.description}</p>
+                    <p className="text-sm text-obsidian-400">{item.description}</p>
                   </div>
                   <ToggleSwitch
                     enabled={(settings[section.category] as any)[item.key]}
                     onToggle={() => handleToggle(section.category, item.key)}
                   />
-                </div>
+                </motion.div>
               ))}
 
               {/* Volume Slider for Voice section */}
               {section.title === 'Voice & Audio' && (
-                <div className="p-4 rounded-xl glass">
+                <motion.div 
+                  className="p-4 rounded-xl bg-white/5 border border-white/10"
+                  whileHover={{ scale: 1.01 }}
+                >
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <h3 className="font-medium text-white">Volume Level</h3>
-                      <p className="text-sm text-gray-400">Adjust voice playback volume</p>
+                      <p className="text-sm text-obsidian-400">Adjust voice playback volume</p>
                     </div>
-                    <span className="text-accent-cyan font-semibold">{settings.voice.volume}%</span>
+                    <span className="text-aurora-400 font-semibold">{settings.voice.volume}%</span>
                   </div>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={settings.voice.volume}
-                    onChange={(e) => handleSliderChange(parseInt(e.target.value))}
-                    className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
-                  />
-                </div>
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={settings.voice.volume}
+                      onChange={(e) => handleSliderChange(parseInt(e.target.value))}
+                      className="w-full h-2 bg-obsidian-600 rounded-lg appearance-none cursor-pointer"
+                      style={{
+                        background: `linear-gradient(to right, #0EA5E9 0%, #0EA5E9 ${settings.voice.volume}%, #495057 ${settings.voice.volume}%, #495057 100%)`
+                      }}
+                    />
+                  </div>
+                </motion.div>
               )}
             </div>
           </motion.div>
@@ -226,63 +246,71 @@ const SettingsSection: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="p-6 rounded-2xl glass glass-hover"
+        className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all duration-300"
       >
         <div className="flex items-center space-x-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-aurora p-0.5">
-            <div className="w-full h-full rounded-xl bg-dark-400 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-premium p-0.5">
+            <div className="w-full h-full rounded-xl bg-obsidian-800 flex items-center justify-center">
               <Settings className="w-5 h-5 text-white" />
             </div>
           </div>
-          <h2 className="font-sora text-xl font-semibold text-white">Advanced</h2>
+          <h2 className="font-manrope text-xl font-semibold text-white">Advanced</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center space-x-3 p-4 rounded-xl glass glass-hover text-left"
+            onClick={() => toast.success('Export feature coming soon!')}
+            className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-aurora-400/50 text-left transition-all duration-300"
           >
-            <Download className="w-5 h-5 text-accent-cyan" />
+            <Download className="w-5 h-5 text-aurora-400" />
             <div>
               <div className="font-medium text-white">Export Data</div>
-              <div className="text-sm text-gray-400">Download your conversations</div>
+              <div className="text-sm text-obsidian-400">Download your conversations</div>
             </div>
           </motion.button>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center space-x-3 p-4 rounded-xl glass glass-hover text-left"
+            onClick={() => toast.info('API Keys management coming soon!')}
+            className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-coral-400/50 text-left transition-all duration-300"
           >
-            <Key className="w-5 h-5 text-accent-pink" />
+            <Key className="w-5 h-5 text-coral-400" />
             <div>
               <div className="font-medium text-white">API Keys</div>
-              <div className="text-sm text-gray-400">Manage external integrations</div>
+              <div className="text-sm text-obsidian-400">Manage external integrations</div>
             </div>
           </motion.button>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center space-x-3 p-4 rounded-xl glass glass-hover text-left"
+            onClick={() => toast.info('Storage management coming soon!')}
+            className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-lavender-400/50 text-left transition-all duration-300"
           >
-            <Database className="w-5 h-5 text-accent-purple" />
+            <Database className="w-5 h-5 text-lavender-400" />
             <div>
               <div className="font-medium text-white">Storage</div>
-              <div className="text-sm text-gray-400">Manage local data</div>
+              <div className="text-sm text-obsidian-400">Manage local data</div>
             </div>
           </motion.button>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            className="flex items-center space-x-3 p-4 rounded-xl glass glass-hover text-left text-red-400"
+            onClick={() => {
+              if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                toast.error('Account deletion is not available in demo mode');
+              }
+            }}
+            className="flex items-center space-x-3 p-4 rounded-xl bg-coral-500/10 border border-coral-500/30 hover:border-coral-500/50 text-left transition-all duration-300"
           >
-            <Trash2 className="w-5 h-5" />
+            <Trash2 className="w-5 h-5 text-coral-400" />
             <div>
-              <div className="font-medium">Delete Account</div>
-              <div className="text-sm text-gray-400">Permanently remove data</div>
+              <div className="font-medium text-coral-300">Delete Account</div>
+              <div className="text-sm text-coral-400/70">Permanently remove data</div>
             </div>
           </motion.button>
         </div>

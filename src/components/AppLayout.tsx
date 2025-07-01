@@ -12,9 +12,11 @@ import TimelineSection from './TimelineSection';
 import MemoryCreator from './MemoryCreator';
 import ChatInterface from './ChatInterface';
 import AuthModal from './AuthModal';
-import { Persona } from '../types';
+import { Database } from '../types/database';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
+
+type Persona = Database['public']['Tables']['personas']['Row'];
 
 const AppLayout: React.FC = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -61,6 +63,19 @@ const AppLayout: React.FC = () => {
     setShowMemoryCreator(true);
   };
 
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    // Add smooth transition feedback
+    toast.success(`Switched to ${tab.charAt(0).toUpperCase() + tab.slice(1)}`, {
+      duration: 1500,
+      style: {
+        background: 'rgba(13, 15, 22, 0.9)',
+        color: '#fff',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+      },
+    });
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
@@ -79,10 +94,27 @@ const AppLayout: React.FC = () => {
         return <TimelineSection />;
       case 'help':
         return (
-          <div className="text-center py-20">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-20"
+          >
+            <div className="w-16 h-16 rounded-2xl bg-gradient-premium p-0.5 mx-auto mb-6">
+              <div className="w-full h-full rounded-2xl bg-obsidian-800 flex items-center justify-center">
+                <span className="text-2xl">❓</span>
+              </div>
+            </div>
             <h2 className="text-2xl font-bold text-white mb-4">Help & Support</h2>
-            <p className="text-gray-400">Help documentation coming soon...</p>
-          </div>
+            <p className="text-obsidian-400 mb-6">Need assistance? We're here to help!</p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => toast.info('Help documentation coming soon!')}
+              className="btn-premium text-obsidian-900 font-bold"
+            >
+              Contact Support
+            </motion.button>
+          </motion.div>
         );
       default:
         return <Dashboard onStartChat={handleStartChat} onCreateMemory={handleCreateMemory} />;
@@ -110,9 +142,14 @@ const AppLayout: React.FC = () => {
 
       <Sidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={handleTabChange}
         isCollapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onToggleCollapse={() => {
+          setSidebarCollapsed(!sidebarCollapsed);
+          toast.success(sidebarCollapsed ? 'Sidebar expanded' : 'Sidebar collapsed', {
+            duration: 1500,
+          });
+        }}
       />
 
       <motion.main
@@ -124,13 +161,23 @@ const AppLayout: React.FC = () => {
         }`}
       >
         <div className="p-8">
-          {renderContent()}
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            {renderContent()}
+          </motion.div>
         </div>
       </motion.main>
 
       <MemoryCreator 
         isOpen={showMemoryCreator} 
-        onClose={() => setShowMemoryCreator(false)} 
+        onClose={() => {
+          setShowMemoryCreator(false);
+          toast.info('Memory creator closed');
+        }} 
       />
 
       <AuthModal 
