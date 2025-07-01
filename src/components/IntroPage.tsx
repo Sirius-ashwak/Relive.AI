@@ -10,6 +10,7 @@ import {
   Zap,
   Star,
   ChevronDown,
+  ChevronUp,
   Volume2,
   Video,
   Check,
@@ -62,7 +63,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
       role: "Grief Counselor",
       avatar: "👩‍⚕️",
       rating: 5,
-      text: "Relive has transformed how my clients process loss. The conversations feel genuinely authentic.",
+      text: "Relive has transformed how my clients process loss. Being able to have one last conversation with a loved one has provided incredible closure and healing.",
       highlight: "transformed how my clients process loss"
     },
     {
@@ -126,7 +127,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
       name: "Free",
       price: "$0",
       period: "forever",
-      description: "Perfect for getting started with memory preservation",
+      description: "Perfect for getting started",
       features: [
         "3 Memory Personas",
         "50 Messages per month",
@@ -136,8 +137,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
       ],
       buttonText: "Start Free",
       popular: false,
-      gradient: "from-obsidian-600/20 to-obsidian-700/20",
-      borderColor: "border-obsidian-500/30"
+      highlight: false
     },
     {
       name: "Pro",
@@ -156,14 +156,13 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
       ],
       buttonText: "Start Pro Trial",
       popular: true,
-      gradient: "from-aurora-500/20 to-lavender-500/20",
-      borderColor: "border-aurora-500/50"
+      highlight: true
     },
     {
       name: "Legacy",
       price: "$49",
       period: "per month",
-      description: "Premium experience for families and professionals",
+      description: "Premium experience for families",
       features: [
         "Everything in Pro",
         "Family sharing (5 accounts)",
@@ -176,8 +175,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
       ],
       buttonText: "Contact Sales",
       popular: false,
-      gradient: "from-gold-500/20 to-coral-500/20",
-      borderColor: "border-gold-500/30"
+      highlight: false
     }
   ];
 
@@ -773,153 +771,99 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
           </div>
         </section>
 
-        {/* Pricing Section */}
-        <section id="pricing" className="py-16 px-6 relative">
+        {/* Pricing Section - Cursor.com Style */}
+        <section id="pricing" className="py-20 px-6 relative">
           <div className="max-w-6xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="text-center mb-12"
+              className="text-center mb-16"
             >
-              <h2 className="font-manrope text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-shadow-lg">
-                <span className="text-white">Choose Your</span>
-                <br />
-                <span className="bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">Memory Journey</span>
+              <h2 className="font-manrope text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+                <span className="text-white">Simple,</span>{' '}
+                <span className="bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">
+                  transparent pricing
+                </span>
               </h2>
-              <p className="text-base md:text-lg text-obsidian-200 max-w-2xl mx-auto leading-relaxed">
-                Start preserving memories today with our flexible pricing plans designed for every need.
+              <p className="text-xl text-obsidian-200 max-w-2xl mx-auto leading-relaxed">
+                Start preserving memories today. Upgrade when you need more.
               </p>
             </motion.div>
 
-            {/* Pricing Cards Container with proper spacing for badge */}
-            <div className="relative">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto pt-12">
-                {pricingPlans.map((plan, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: index * 0.2 }}
-                    whileHover={{ y: -6, scale: 1.02 }}
-                    className={`relative card-premium bg-gradient-to-br ${plan.gradient} border-2 ${plan.borderColor} ${
-                      plan.popular ? 'ring-2 ring-aurora-500/30 shadow-2xl shadow-aurora-500/20' : ''
-                    } p-5`}
-                  >
-                    {/* Enhanced Popular Badge */}
-                    {plan.popular && (
-                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-20">
-                        <motion.div
-                          initial={{ scale: 0, rotate: -10 }}
-                          animate={{ scale: 1, rotate: 0 }}
-                          transition={{ 
-                            type: "spring", 
-                            stiffness: 200, 
-                            damping: 15,
-                            delay: 0.5 + index * 0.2 
-                          }}
-                          className="relative"
-                        >
-                          {/* Badge glow effect */}
-                          <div className="absolute inset-0 bg-gradient-premium rounded-full blur-md opacity-60 scale-110"></div>
-                          
-                          {/* Main badge */}
-                          <div className="relative flex items-center space-x-2 px-4 py-2 bg-gradient-premium rounded-full text-obsidian-900 font-bold text-sm shadow-xl border-2 border-white/20">
-                            <motion.div
-                              animate={{ rotate: [0, 10, -10, 0] }}
-                              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                            >
-                              <Crown className="w-4 h-4" />
-                            </motion.div>
-                            <span>Most Popular</span>
-                          </div>
-                          
-                          {/* Sparkle effects */}
-                          <motion.div
-                            className="absolute -top-1 -right-1 w-2 h-2 bg-gold-400 rounded-full"
-                            animate={{ 
-                              scale: [0, 1, 0],
-                              opacity: [0, 1, 0]
-                            }}
-                            transition={{ 
-                              duration: 2, 
-                              repeat: Infinity, 
-                              delay: 0.5 
-                            }}
-                          />
-                          <motion.div
-                            className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-aurora-400 rounded-full"
-                            animate={{ 
-                              scale: [0, 1, 0],
-                              opacity: [0, 1, 0]
-                            }}
-                            transition={{ 
-                              duration: 2, 
-                              repeat: Infinity, 
-                              delay: 1 
-                            }}
-                          />
-                        </motion.div>
+            {/* Pricing Cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {pricingPlans.map((plan, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  className={`relative rounded-2xl p-8 ${
+                    plan.highlight 
+                      ? 'bg-white/10 border-2 border-aurora-500/50 shadow-2xl shadow-aurora-500/20' 
+                      : 'bg-white/5 border border-white/10'
+                  } backdrop-blur-xl transition-all duration-300 hover:border-white/30`}
+                >
+                  {/* Popular Badge */}
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <div className="bg-gradient-premium text-obsidian-900 px-4 py-2 rounded-full text-sm font-bold">
+                        Most Popular
                       </div>
-                    )}
-
-                    <div className="text-center mb-6 mt-2">
-                      <h3 className="font-manrope text-xl font-bold text-white mb-2">{plan.name}</h3>
-                      <div className="flex items-baseline justify-center space-x-1 mb-3">
-                        <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">{plan.price}</span>
-                        <span className="text-obsidian-400 text-sm">/{plan.period}</span>
-                      </div>
-                      <p className="text-obsidian-300 text-sm leading-relaxed">{plan.description}</p>
                     </div>
+                  )}
 
-                    <div className="space-y-3 mb-6">
-                      {plan.features.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex items-center space-x-2">
-                          <div className="w-4 h-4 rounded-full bg-gradient-premium flex items-center justify-center flex-shrink-0">
-                            <Check className="w-2.5 h-2.5 text-obsidian-900" />
-                          </div>
-                          <span className="text-obsidian-200 text-sm">{feature}</span>
+                  {/* Plan Header */}
+                  <div className="mb-8">
+                    <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                    <div className="flex items-baseline mb-4">
+                      <span className="text-5xl font-bold text-white">{plan.price}</span>
+                      <span className="text-obsidian-400 ml-2">/{plan.period}</span>
+                    </div>
+                    <p className="text-obsidian-300">{plan.description}</p>
+                  </div>
+
+                  {/* Features List */}
+                  <div className="space-y-4 mb-8">
+                    {plan.features.map((feature, featureIndex) => (
+                      <div key={featureIndex} className="flex items-start space-x-3">
+                        <div className="w-5 h-5 rounded-full bg-gradient-premium flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Check className="w-3 h-3 text-obsidian-900" />
                         </div>
-                      ))}
-                    </div>
+                        <span className="text-white text-sm leading-relaxed">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
 
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={handleGetStarted}
-                      className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 text-sm ${
-                        plan.popular
-                          ? 'btn-premium text-obsidian-900'
-                          : 'glass glass-hover text-white border border-white/20 hover:border-aurora-400/50'
-                      }`}
-                    >
-                      {plan.buttonText}
-                    </motion.button>
-
-                    {/* Bottom Accent */}
-                    <motion.div
-                      className="absolute bottom-0 left-0 h-0.5 bg-gradient-premium rounded-full"
-                      initial={{ width: 0 }}
-                      whileInView={{ width: "100%" }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1, delay: 0.5 + index * 0.2 }}
-                    />
-                  </motion.div>
-                ))}
-              </div>
+                  {/* CTA Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleGetStarted}
+                    className={`w-full py-4 rounded-xl font-semibold text-base transition-all duration-300 ${
+                      plan.highlight
+                        ? 'bg-gradient-premium text-obsidian-900 shadow-lg hover:shadow-xl'
+                        : 'bg-white/10 text-white border border-white/20 hover:bg-white/20'
+                    }`}
+                  >
+                    {plan.buttonText}
+                  </motion.button>
+                </motion.div>
+              ))}
             </div>
 
-            {/* Pricing Benefits */}
+            {/* Pricing Footer */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="mt-12 text-center"
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="text-center mt-16"
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
                 {[
                   { icon: Sparkles, text: "30-day money-back guarantee" },
                   { icon: Shield, text: "Enterprise-grade security" },
@@ -930,10 +874,10 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
-                    className="flex items-center justify-center space-x-2 p-3 glass glass-hover rounded-xl"
+                    transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
+                    className="flex items-center justify-center space-x-3 p-4 rounded-xl bg-white/5 border border-white/10"
                   >
-                    <benefit.icon className="w-4 h-4 text-aurora-400 flex-shrink-0" />
+                    <benefit.icon className="w-5 h-5 text-aurora-400 flex-shrink-0" />
                     <span className="text-white font-medium text-sm">{benefit.text}</span>
                   </motion.div>
                 ))}
