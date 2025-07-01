@@ -274,7 +274,7 @@ const SettingsSection: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => toast.info('API Keys management coming soon!')}
+            onClick={() => toast('API Keys management coming soon!')}
             className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-coral-400/50 text-left transition-all duration-300"
           >
             <Key className="w-5 h-5 text-coral-400" />
@@ -287,7 +287,7 @@ const SettingsSection: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => toast.info('Storage management coming soon!')}
+            onClick={() => toast('Storage management coming soon!')}
             className="flex items-center space-x-3 p-4 rounded-xl bg-white/5 border border-white/10 hover:border-lavender-400/50 text-left transition-all duration-300"
           >
             <Database className="w-5 h-5 text-lavender-400" />
