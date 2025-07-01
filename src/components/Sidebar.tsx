@@ -13,6 +13,8 @@ import {
   LogOut,
   LayoutDashboard
 } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
+import toast from 'react-hot-toast';
 
 interface SidebarProps {
   activeTab: string;
@@ -27,6 +29,18 @@ const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed, 
   onToggleCollapse 
 }) => {
+  const { logout } = useAuthStore();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Successfully signed out');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Failed to sign out');
+    }
+  };
+
   const navigationItems = [
     {
       id: 'dashboard',
@@ -96,11 +110,11 @@ const Sidebar: React.FC<SidebarProps> = ({
             className={`flex items-center space-x-3 ${isCollapsed ? 'justify-center' : ''}`}
             whileHover={{ scale: 1.02 }}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-aurora flex items-center justify-center">
-              <Brain className="w-6 h-6 text-dark-500" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-premium flex items-center justify-center">
+              <Brain className="w-6 h-6 text-obsidian-900" />
             </div>
             {!isCollapsed && (
-              <span className="font-sora font-bold text-xl gradient-text">
+              <span className="font-manrope font-bold text-xl gradient-text">
                 Relive
               </span>
             )}
@@ -128,8 +142,8 @@ const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => onTabChange(item.id)}
               className={`w-full flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${
                 activeTab === item.id
-                  ? 'bg-gradient-aurora text-dark-500 font-semibold'
-                  : 'glass glass-hover text-white hover:text-accent-cyan'
+                  ? 'bg-gradient-premium text-obsidian-900 font-semibold'
+                  : 'glass glass-hover text-white hover:text-aurora-400'
               } ${isCollapsed ? 'justify-center' : ''}`}
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -137,7 +151,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <div className="text-left">
                   <div className="font-medium">{item.label}</div>
                   <div className={`text-xs ${
-                    activeTab === item.id ? 'text-dark-400' : 'text-gray-400'
+                    activeTab === item.id ? 'text-obsidian-600' : 'text-obsidian-400'
                   }`}>
                     {item.description}
                   </div>
@@ -157,8 +171,8 @@ const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => onTabChange(item.id)}
               className={`w-full flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${
                 activeTab === item.id
-                  ? 'bg-gradient-aurora text-dark-500 font-semibold'
-                  : 'glass glass-hover text-white hover:text-accent-cyan'
+                  ? 'bg-gradient-premium text-obsidian-900 font-semibold'
+                  : 'glass glass-hover text-white hover:text-aurora-400'
               } ${isCollapsed ? 'justify-center' : ''}`}
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -166,7 +180,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <div className="text-left">
                   <div className="font-medium">{item.label}</div>
                   <div className={`text-xs ${
-                    activeTab === item.id ? 'text-dark-400' : 'text-gray-400'
+                    activeTab === item.id ? 'text-obsidian-600' : 'text-obsidian-400'
                   }`}>
                     {item.description}
                   </div>
@@ -178,7 +192,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           <motion.button
             whileHover={{ scale: 1.02, x: 5 }}
             whileTap={{ scale: 0.98 }}
-            className={`w-full flex items-center space-x-3 p-3 rounded-xl glass glass-hover text-red-400 hover:text-red-300 ${
+            onClick={handleLogout}
+            className={`w-full flex items-center space-x-3 p-3 rounded-xl glass glass-hover text-coral-400 hover:text-coral-300 transition-all duration-200 ${
               isCollapsed ? 'justify-center' : ''
             }`}
           >

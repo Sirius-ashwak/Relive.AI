@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Brain, Settings, User, Menu, LogOut } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import AuthModal from './AuthModal';
+import toast from 'react-hot-toast';
 
 const Header = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -11,8 +12,10 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       await logout();
+      toast.success('Successfully signed out');
     } catch (error) {
       console.error('Logout error:', error);
+      toast.error('Failed to sign out');
     }
   };
 
@@ -47,11 +50,11 @@ const Header = () => {
                   <div className="hidden md:flex items-center space-x-3 px-4 py-2 rounded-xl glass">
                     <div className="w-8 h-8 rounded-lg bg-gradient-premium p-0.5">
                       <div className="w-full h-full rounded-lg bg-obsidian-800 flex items-center justify-center text-sm">
-                        {user?.user_metadata?.name?.[0] || user?.email?.[0] || '👤'}
+                        {user?.name?.[0] || user?.email?.[0] || '👤'}
                       </div>
                     </div>
                     <span className="text-white font-medium text-sm">
-                      {user?.user_metadata?.name || user?.email?.split('@')[0] || 'User'}
+                      {user?.name || user?.email?.split('@')[0] || 'User'}
                     </span>
                   </div>
                   
@@ -67,7 +70,7 @@ const Header = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleLogout}
-                    className="p-3 rounded-xl glass glass-hover text-coral-400 hover:text-coral-300"
+                    className="p-3 rounded-xl glass glass-hover text-coral-400 hover:text-coral-300 transition-colors"
                     title="Sign Out"
                   >
                     <LogOut className="w-5 h-5" />
