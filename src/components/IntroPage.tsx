@@ -203,7 +203,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
   return (
     <>
       <div className="min-h-screen bg-obsidian-950 overflow-x-hidden">
-        {/* Badge - Positioned in top right */}
+        {/* Bolt.new Badge - Positioned in top right */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: -20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -219,7 +219,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
             className="group cursor-pointer block"
             title="Built with Bolt.new - Click to visit"
           >
-            <div className="relative w-16 h-16">
+            <div className="relative w-20 h-20">
               {/* Enhanced glow effect */}
               <motion.div 
                 className="absolute inset-0 rounded-full bg-white/40 blur-xl"
@@ -234,16 +234,27 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
                 }}
               />
               
-              {/* Outer ring with strong border */}
-              <div className="absolute inset-0 rounded-full border-4 border-white/60 group-hover:border-white/90 transition-all duration-300 bg-white/20 backdrop-blur-sm shadow-2xl" />
-              
-              {/* Main badge content - Custom image */}
-              <div className="relative w-full h-full rounded-full bg-white shadow-2xl group-hover:shadow-white/40 transition-all duration-300 overflow-hidden flex items-center justify-center">
-                <img 
-                  src="/white_circle_360x360.png" 
-                  alt="Built with Bolt.new"
-                  className="w-12 h-12 object-contain"
-                />
+              {/* Main badge with circular text */}
+              <div className="relative w-full h-full">
+                {/* Circular text path */}
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 80 80">
+                  <defs>
+                    <path
+                      id="circle-path"
+                      d="M 40, 40 m -30, 0 a 30,30 0 1,1 60,0 a 30,30 0 1,1 -60,0"
+                    />
+                  </defs>
+                  <text className="text-[6px] font-bold fill-white" style={{ letterSpacing: '1px' }}>
+                    <textPath href="#circle-path" startOffset="0%">
+                      POWERED BY BOLT.NEW • POWERED BY BOLT.NEW • 
+                    </textPath>
+                  </text>
+                </svg>
+                
+                {/* Center circle with logo */}
+                <div className="absolute inset-4 rounded-full bg-white shadow-2xl group-hover:shadow-white/40 transition-all duration-300 flex items-center justify-center">
+                  <div className="text-black font-bold text-2xl">b</div>
+                </div>
               </div>
               
               {/* Hover effect overlay */}
