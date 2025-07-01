@@ -33,38 +33,13 @@ const BoltBadge: React.FC = () => {
         {/* Outer ring with strong border */}
         <div className="absolute inset-0 rounded-full border-4 border-white/60 group-hover:border-white/90 transition-all duration-300 bg-white/20 backdrop-blur-sm shadow-2xl" />
         
-        {/* Main badge content - Always visible SVG */}
+        {/* Main badge content - Custom image */}
         <div className="relative w-full h-full rounded-full bg-white shadow-2xl group-hover:shadow-white/40 transition-all duration-300 overflow-hidden flex items-center justify-center">
-          {/* Bolt.new SVG Logo */}
-          <svg 
-            width="48" 
-            height="48" 
-            viewBox="0 0 48 48" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-12 h-12"
-          >
-            {/* Bolt icon in Bolt.new brand color */}
-            <path 
-              d="M14 12 L26 12 L20 24 L34 24 L18 36 L24 24 L14 24 Z" 
-              fill="#FF6154"
-              stroke="#FF6154"
-              strokeWidth="1"
-            />
-            
-            {/* "BOLT" text */}
-            <text 
-              x="24" 
-              y="42" 
-              textAnchor="middle" 
-              fill="#333" 
-              fontSize="6" 
-              fontWeight="bold" 
-              fontFamily="Arial, sans-serif"
-            >
-              BOLT.NEW
-            </text>
-          </svg>
+          <img 
+            src="/white_circle_360x360.png" 
+            alt="Built with Bolt.new"
+            className="w-12 h-12 object-contain"
+          />
         </div>
         
         {/* Hover effect overlay */}
