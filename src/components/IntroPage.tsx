@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Brain, 
-  ArrowRight, 
+  Play, 
   Sparkles, 
-  Heart, 
   Clock, 
-  Users,
+  ArrowRight,
   MessageCircle,
-  Play,
   Shield,
   Zap,
   Star,
@@ -16,7 +13,9 @@ import {
   Volume2,
   Video,
   Check,
-  Crown
+  Crown,
+  Heart,
+  Brain
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import AuthModal from './AuthModal';
@@ -794,72 +793,122 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
               </p>
             </motion.div>
 
-            {/* Pricing Cards Container with extra top padding */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto pt-8">
-              {pricingPlans.map((plan, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: index * 0.2 }}
-                  whileHover={{ y: -6, scale: 1.02 }}
-                  className={`card-premium relative bg-gradient-to-br ${plan.gradient} border-2 ${plan.borderColor} ${
-                    plan.popular ? 'ring-2 ring-aurora-500/50' : ''
-                  } p-5`}
-                >
-                  {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                      <div className="flex items-center space-x-1 px-3 py-1 bg-gradient-premium rounded-full text-obsidian-900 font-bold text-xs shadow-lg">
-                        <Crown className="w-3 h-3" />
-                        <span>Most Popular</span>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="text-center mb-6">
-                    <h3 className="font-manrope text-xl font-bold text-white mb-2">{plan.name}</h3>
-                    <div className="flex items-baseline justify-center space-x-1 mb-3">
-                      <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">{plan.price}</span>
-                      <span className="text-obsidian-400 text-sm">/{plan.period}</span>
-                    </div>
-                    <p className="text-obsidian-300 text-sm leading-relaxed">{plan.description}</p>
-                  </div>
-
-                  <div className="space-y-3 mb-6">
-                    {plan.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center space-x-2">
-                        <div className="w-4 h-4 rounded-full bg-gradient-premium flex items-center justify-center flex-shrink-0">
-                          <Check className="w-2.5 h-2.5 text-obsidian-900" />
-                        </div>
-                        <span className="text-obsidian-200 text-sm">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleGetStarted}
-                    className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 text-sm ${
-                      plan.popular
-                        ? 'btn-premium text-obsidian-900'
-                        : 'glass glass-hover text-white border border-white/20 hover:border-aurora-400/50'
-                    }`}
-                  >
-                    {plan.buttonText}
-                  </motion.button>
-
-                  {/* Bottom Accent */}
+            {/* Pricing Cards Container with proper spacing for badge */}
+            <div className="relative">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto pt-12">
+                {pricingPlans.map((plan, index) => (
                   <motion.div
-                    className="absolute bottom-0 left-0 h-0.5 bg-gradient-premium rounded-full"
-                    initial={{ width: 0 }}
-                    whileInView={{ width: "100%" }}
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 1, delay: 0.5 + index * 0.2 }}
-                  />
-                </motion.div>
-              ))}
+                    transition={{ duration: 0.8, delay: index * 0.2 }}
+                    whileHover={{ y: -6, scale: 1.02 }}
+                    className={`relative card-premium bg-gradient-to-br ${plan.gradient} border-2 ${plan.borderColor} ${
+                      plan.popular ? 'ring-2 ring-aurora-500/30 shadow-2xl shadow-aurora-500/20' : ''
+                    } p-5`}
+                  >
+                    {/* Enhanced Popular Badge */}
+                    {plan.popular && (
+                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-20">
+                        <motion.div
+                          initial={{ scale: 0, rotate: -10 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ 
+                            type: "spring", 
+                            stiffness: 200, 
+                            damping: 15,
+                            delay: 0.5 + index * 0.2 
+                          }}
+                          className="relative"
+                        >
+                          {/* Badge glow effect */}
+                          <div className="absolute inset-0 bg-gradient-premium rounded-full blur-md opacity-60 scale-110"></div>
+                          
+                          {/* Main badge */}
+                          <div className="relative flex items-center space-x-2 px-4 py-2 bg-gradient-premium rounded-full text-obsidian-900 font-bold text-sm shadow-xl border-2 border-white/20">
+                            <motion.div
+                              animate={{ rotate: [0, 10, -10, 0] }}
+                              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                            >
+                              <Crown className="w-4 h-4" />
+                            </motion.div>
+                            <span>Most Popular</span>
+                          </div>
+                          
+                          {/* Sparkle effects */}
+                          <motion.div
+                            className="absolute -top-1 -right-1 w-2 h-2 bg-gold-400 rounded-full"
+                            animate={{ 
+                              scale: [0, 1, 0],
+                              opacity: [0, 1, 0]
+                            }}
+                            transition={{ 
+                              duration: 2, 
+                              repeat: Infinity, 
+                              delay: 0.5 
+                            }}
+                          />
+                          <motion.div
+                            className="absolute -bottom-1 -left-1 w-1.5 h-1.5 bg-aurora-400 rounded-full"
+                            animate={{ 
+                              scale: [0, 1, 0],
+                              opacity: [0, 1, 0]
+                            }}
+                            transition={{ 
+                              duration: 2, 
+                              repeat: Infinity, 
+                              delay: 1 
+                            }}
+                          />
+                        </motion.div>
+                      </div>
+                    )}
+
+                    <div className="text-center mb-6 mt-2">
+                      <h3 className="font-manrope text-xl font-bold text-white mb-2">{plan.name}</h3>
+                      <div className="flex items-baseline justify-center space-x-1 mb-3">
+                        <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-aurora-500 via-lavender-500 to-coral-500 bg-clip-text text-transparent">{plan.price}</span>
+                        <span className="text-obsidian-400 text-sm">/{plan.period}</span>
+                      </div>
+                      <p className="text-obsidian-300 text-sm leading-relaxed">{plan.description}</p>
+                    </div>
+
+                    <div className="space-y-3 mb-6">
+                      {plan.features.map((feature, featureIndex) => (
+                        <div key={featureIndex} className="flex items-center space-x-2">
+                          <div className="w-4 h-4 rounded-full bg-gradient-premium flex items-center justify-center flex-shrink-0">
+                            <Check className="w-2.5 h-2.5 text-obsidian-900" />
+                          </div>
+                          <span className="text-obsidian-200 text-sm">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleGetStarted}
+                      className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 text-sm ${
+                        plan.popular
+                          ? 'btn-premium text-obsidian-900'
+                          : 'glass glass-hover text-white border border-white/20 hover:border-aurora-400/50'
+                      }`}
+                    >
+                      {plan.buttonText}
+                    </motion.button>
+
+                    {/* Bottom Accent */}
+                    <motion.div
+                      className="absolute bottom-0 left-0 h-0.5 bg-gradient-premium rounded-full"
+                      initial={{ width: 0 }}
+                      whileInView={{ width: "100%" }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1, delay: 0.5 + index * 0.2 }}
+                    />
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             {/* Pricing Benefits */}
