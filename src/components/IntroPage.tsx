@@ -67,20 +67,44 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
       highlight: "transformed how my clients process loss"
     },
     {
+      name: "Marcus Rodriguez",
+      role: "Tech Executive",
+      avatar: "👨‍💼",
+      rating: 5,
+      text: "Talking to my future self helped me make one of the biggest decisions of my career. The AI understood my aspirations better than I did.",
+      highlight: "understood my aspirations better than I did"
+    },
+    {
+      name: "Emily Watson",
+      role: "Artist & Mother",
+      avatar: "👩‍🎨",
+      rating: 5,
+      text: "I created a replica of my grandmother to share her stories with my children. They get to know her wisdom and love even though she's gone.",
+      highlight: "share her stories with my children"
+    },
+    {
       name: "Dr. James Kim",
       role: "Psychologist",
       avatar: "👨‍🔬",
       rating: 5,
-      text: "The therapeutic potential is immense. Patients can work through trauma in a safe environment.",
-      highlight: "therapeutic potential is immense"
+      text: "The therapeutic potential is immense. Patients can practice difficult conversations and work through past trauma in a safe environment.",
+      highlight: "practice difficult conversations"
     },
     {
       name: "Maria Santos",
       role: "Retired Teacher",
       avatar: "👩‍🏫",
       rating: 5,
-      text: "I'm preserving my memories for my grandchildren. They'll be able to talk to me forever.",
+      text: "At 70, I'm preserving my memories for my grandchildren. They'll be able to talk to me even when I'm no longer here.",
       highlight: "preserving my memories for my grandchildren"
+    },
+    {
+      name: "Alex Thompson",
+      role: "Software Engineer",
+      avatar: "👨‍💻",
+      rating: 5,
+      text: "Conversations with my younger self help me remember why I started coding. It's like having a personal mentor who truly gets me.",
+      highlight: "like having a personal mentor"
     }
   ];
 
@@ -200,12 +224,12 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
   return (
     <>
       <div className="min-h-screen bg-obsidian-950 overflow-x-hidden">
-        {/* Badge - Positioned in top right */}
+        {/* Badge - Positioned in top right with lower z-index */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: -20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.5, type: "spring", stiffness: 200 }}
-          className="fixed top-6 right-6 z-50"
+          className="fixed top-6 right-6 z-30"
         >
           <motion.a
             href="https://bolt.new/"
@@ -315,7 +339,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="fixed top-0 left-0 right-0 z-40 px-6 py-3"
+          className="fixed top-0 left-0 right-0 z-50 px-6 py-3"
         >
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <motion.div 
