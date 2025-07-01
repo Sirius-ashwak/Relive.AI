@@ -805,10 +805,10 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
                   whileHover={{ y: -6, scale: 1.02 }}
                   className={`card-premium relative bg-gradient-to-br ${plan.gradient} border-2 ${plan.borderColor} ${
                     plan.popular ? 'ring-2 ring-aurora-500/50' : ''
-                  } p-5`}
+                  } p-5 ${plan.popular ? 'pt-8' : ''}`}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                       <div className="flex items-center space-x-1 px-3 py-1 bg-gradient-premium rounded-full text-obsidian-900 font-bold text-xs">
                         <Crown className="w-3 h-3" />
                         <span>Most Popular</span>
