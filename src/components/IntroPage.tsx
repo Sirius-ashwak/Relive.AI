@@ -318,7 +318,7 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="fixed top-0 left-0 right-0 z-50 px-6 py-3"
+          className="fixed top-0 left-0 right-0 z-40 px-6 py-3"
         >
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <motion.div 
@@ -794,7 +794,8 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
               </p>
             </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {/* Pricing Cards Container with extra top padding */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto pt-8">
               {pricingPlans.map((plan, index) => (
                 <motion.div
                   key={index}
@@ -805,11 +806,11 @@ const IntroPage: React.FC<IntroPageProps> = ({ onEnterApp }) => {
                   whileHover={{ y: -6, scale: 1.02 }}
                   className={`card-premium relative bg-gradient-to-br ${plan.gradient} border-2 ${plan.borderColor} ${
                     plan.popular ? 'ring-2 ring-aurora-500/50' : ''
-                  } p-5 ${plan.popular ? 'pt-8' : ''}`}
+                  } p-5`}
                 >
                   {plan.popular && (
-                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <div className="flex items-center space-x-1 px-3 py-1 bg-gradient-premium rounded-full text-obsidian-900 font-bold text-xs">
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                      <div className="flex items-center space-x-1 px-3 py-1 bg-gradient-premium rounded-full text-obsidian-900 font-bold text-xs shadow-lg">
                         <Crown className="w-3 h-3" />
                         <span>Most Popular</span>
                       </div>
